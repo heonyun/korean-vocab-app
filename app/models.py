@@ -1,0 +1,30 @@
+from pydantic import BaseModel
+from typing import List, Optional
+from datetime import datetime
+
+class UsageExample(BaseModel):
+    korean_sentence: str
+    russian_translation: str
+    grammar_note: str
+    context: str
+
+class VocabularyEntry(BaseModel):
+    id: Optional[str] = None
+    original_word: str
+    russian_translation: str
+    pronunciation: str
+    usage_examples: List[UsageExample]
+    created_at: Optional[datetime] = None
+    
+    class Config:
+        json_encoders = {
+            datetime: lambda v: v.isoformat() if v else None
+        }
+
+class VocabularyRequest(BaseModel):
+    korean_word: str
+
+class VocabularyResponse(BaseModel):
+    success: bool
+    data: Optional[VocabularyEntry] = None
+    error: Optional[str] = None
