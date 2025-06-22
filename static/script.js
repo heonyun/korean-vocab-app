@@ -75,7 +75,11 @@ function displayVocabularyResult(data) {
         const exampleDiv = document.createElement('div');
         exampleDiv.className = 'example-item';
         exampleDiv.innerHTML = `
-            <div class="example-korean">${example.korean_sentence}</div>
+            <div class="example-header">
+                <div class="example-korean">${example.korean_sentence}</div>
+                <button onclick="playExamplePronunciation('${example.korean_sentence.replace(/'/g, "\\'")}', ${index})" 
+                        class="example-play-btn" title="발음 듣기">🔊</button>
+            </div>
             <div class="example-russian">${example.russian_translation}</div>
             <div class="example-meta">
                 <div class="example-grammar">
@@ -93,16 +97,102 @@ function displayVocabularyResult(data) {
 function playPronunciation() {
     const word = document.getElementById('original-word').textContent;
     if (word && word !== '-') {
-        // 브라우저 TTS 사용
-        if ('speechSynthesis' in window) {
-            const utterance = new SpeechSynthesisUtterance(word);
-            utterance.lang = 'ko-KR';
-            utterance.rate = 0.8;  // 조금 느리게
-            window.speechSynthesis.speak(utterance);
-        } else {
-            alert('이 브라우저는 음성 재생을 지원하지 않습니다.');
-        }
+        playKoreanText(word);
     }
+}
+
+// 예제 발음 재생
+function playExamplePronunciation(sentence, index) {
+    if (sentence) {
+        playKoreanText(sentence, index);
+    }
+}
+
+// 한국어 텍스트 음성 재생 (공통 함수)
+function playKoreanText(text, exampleIndex = null) {
+    if (!text) return;
+    
+    // 브라우저 TTS 지원 확인
+    if (!('speechSynthesis' in window)) {
+        alert('이 브라우저는 음성 재생을 지원하지 않습니다.');
+        return;
+    }
+    
+    try {
+        // 현재 재생 중인 음성 중지
+        window.speechSynthesis.cancel();
+        
+        // 음성 재생 설정
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ko-KR';
+        utterance.rate = getPlaybackRate(); // 사용자 설정 속도
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        
+        // 재생 중 시각적 피드백
+        const playingClass = 'playing-audio';
+        let targetButton = null;
+        
+        if (exampleIndex !== null) {
+            // 예제 버튼 찾기
+            const exampleItems = document.querySelectorAll('.example-item');
+            if (exampleItems[exampleIndex]) {
+                targetButton = exampleItems[exampleIndex].querySelector('.example-play-btn');
+            }
+        } else {
+            // 메인 재생 버튼
+            targetButton = document.querySelector('.play-btn');
+        }
+        
+        // 재생 시작 이벤트
+        utterance.onstart = () => {
+            console.log(`🔊 음성 재생 시작: ${text}`);
+            if (targetButton) {
+                targetButton.classList.add(playingClass);
+                targetButton.textContent = '⏸️';
+                targetButton.title = '재생 중...';
+            }
+        };
+        
+        // 재생 완료 이벤트
+        utterance.onend = () => {
+            console.log('🔇 음성 재생 완료');
+            if (targetButton) {
+                targetButton.classList.remove(playingClass);
+                targetButton.textContent = '🔊';
+                targetButton.title = '발음 듣기';
+            }
+        };
+        
+        // 재생 오류 이벤트
+        utterance.onerror = (event) => {
+            console.error('❌ 음성 재생 오류:', event.error);
+            if (targetButton) {
+                targetButton.classList.remove(playingClass);
+                targetButton.textContent = '🔊';
+                targetButton.title = '발음 듣기';
+            }
+            alert('음성 재생 중 오류가 발생했습니다.');
+        };
+        
+        // 음성 재생 시작
+        window.speechSynthesis.speak(utterance);
+        
+    } catch (error) {
+        console.error('❌ TTS 오류:', error);
+        alert('음성 재생에 실패했습니다.');
+    }
+}
+
+// 재생 속도 가져오기 (localStorage에서)
+function getPlaybackRate() {
+    const savedRate = localStorage.getItem('tts-playback-rate');
+    return savedRate ? parseFloat(savedRate) : 0.8; // 기본값 0.8 (조금 느리게)
+}
+
+// 재생 속도 설정
+function setPlaybackRate(rate) {
+    localStorage.setItem('tts-playback-rate', rate.toString());
 }
 
 // 어휘 저장 (이미 자동으로 저장되므로 알림만)
@@ -185,10 +275,14 @@ async function showVocabularyDetail(word) {
 // 어휘 상세 HTML 생성
 function createVocabularyDetailHTML(data) {
     let examplesHTML = '';
-    data.usage_examples.forEach(example => {
+    data.usage_examples.forEach((example, index) => {
         examplesHTML += `
             <div class="example-item">
-                <div class="example-korean">${example.korean_sentence}</div>
+                <div class="example-header">
+                    <div class="example-korean">${example.korean_sentence}</div>
+                    <button onclick="playExamplePronunciation('${example.korean_sentence.replace(/'/g, "\\'")}', ${index})" 
+                            class="example-play-btn" title="발음 듣기">🔊</button>
+                </div>
                 <div class="example-russian">${example.russian_translation}</div>
                 <div class="example-meta">
                     <div class="example-grammar">

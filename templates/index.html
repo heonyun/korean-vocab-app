@@ -30,8 +30,15 @@
 <body>
     <div class="container">
         <header class="header">
-            <h1>📝 한국어 어휘 학습 노트</h1>
-            <p>러시아인을 위한 한국어 어휘 학습 도구</p>
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>📝 한국어 어휘 학습 노트</h1>
+                    <p>러시아인을 위한 한국어 어휘 학습 도구</p>
+                </div>
+                <div class="header-actions">
+                    <button id="audio-settings-btn" class="header-btn" title="음성 설정">🔧</button>
+                </div>
+            </div>
         </header>
 
         <main class="main-content">
@@ -123,6 +130,35 @@
         <footer class="footer">
             <p>AI 기반 한국어 학습 도구 | PydanticAI + Gemini</p>
         </footer>
+    </div>
+
+    <!-- 음성 설정 패널 -->
+    <div id="audio-settings-panel" class="settings-panel hidden">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h3>🔊 음성 설정</h3>
+                <button id="close-settings-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="settings-body">
+                <div class="setting-item">
+                    <label for="playback-rate-slider">재생 속도</label>
+                    <div class="slider-container">
+                        <input type="range" id="playback-rate-slider" 
+                               min="0.5" max="1.5" step="0.1" value="0.8">
+                        <span id="playback-rate-value">0.8x</span>
+                    </div>
+                    <div class="speed-presets">
+                        <button class="speed-preset" data-speed="0.5">느리게</button>
+                        <button class="speed-preset" data-speed="0.8">보통</button>
+                        <button class="speed-preset" data-speed="1.0">빠르게</button>
+                        <button class="speed-preset" data-speed="1.2">매우 빠르게</button>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <button id="test-audio-btn" class="test-btn">🔊 테스트 재생</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 모달 -->
@@ -238,6 +274,64 @@
         window.addEventListener('offline', () => {
             console.log('📵 오프라인 상태');
             showNotification('오프라인 모드입니다. 저장된 어휘는 계속 볼 수 있습니다', 'info');
+        });
+
+        // 음성 설정 패널 관리
+        document.addEventListener('DOMContentLoaded', () => {
+            const settingsBtn = document.getElementById('audio-settings-btn');
+            const settingsPanel = document.getElementById('audio-settings-panel');
+            const closeSettingsBtn = document.getElementById('close-settings-btn');
+            const playbackRateSlider = document.getElementById('playback-rate-slider');
+            const playbackRateValue = document.getElementById('playback-rate-value');
+            const speedPresets = document.querySelectorAll('.speed-preset');
+            const testAudioBtn = document.getElementById('test-audio-btn');
+
+            // 설정 패널 열기
+            settingsBtn?.addEventListener('click', () => {
+                settingsPanel.classList.remove('hidden');
+                // 현재 설정값 로드
+                const currentRate = getPlaybackRate();
+                playbackRateSlider.value = currentRate;
+                playbackRateValue.textContent = currentRate + 'x';
+            });
+
+            // 설정 패널 닫기
+            closeSettingsBtn?.addEventListener('click', () => {
+                settingsPanel.classList.add('hidden');
+            });
+
+            // 패널 외부 클릭시 닫기
+            settingsPanel?.addEventListener('click', (e) => {
+                if (e.target === settingsPanel) {
+                    settingsPanel.classList.add('hidden');
+                }
+            });
+
+            // 재생 속도 슬라이더
+            playbackRateSlider?.addEventListener('input', (e) => {
+                const rate = parseFloat(e.target.value);
+                setPlaybackRate(rate);
+                playbackRateValue.textContent = rate + 'x';
+            });
+
+            // 속도 프리셋 버튼들
+            speedPresets.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const speed = parseFloat(btn.dataset.speed);
+                    setPlaybackRate(speed);
+                    playbackRateSlider.value = speed;
+                    playbackRateValue.textContent = speed + 'x';
+                    
+                    // 활성 상태 표시
+                    speedPresets.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+
+            // 테스트 음성 재생
+            testAudioBtn?.addEventListener('click', () => {
+                playKoreanText('안녕하세요. 한국어 음성 테스트입니다.');
+            });
         });
     </script>
 
