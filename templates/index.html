@@ -36,8 +36,8 @@
                     <p>러시아인을 위한 한국어 어휘 학습 도구</p>
                 </div>
                 <div class="header-actions">
-                    <button id="theme-toggle-btn" class="header-btn" title="다크모드 전환">🌙</button>
-                    <button id="audio-settings-btn" class="header-btn" title="음성 설정">🔧</button>
+                    <button id="theme-toggle-btn" class="header-btn" title="다크모드 전환" tabindex="7" aria-label="테마 전환">🌙</button>
+                    <button id="audio-settings-btn" class="header-btn" title="음성 설정" tabindex="8" aria-label="음성 설정 열기">🔧</button>
                 </div>
             </div>
         </header>
@@ -51,11 +51,16 @@
                         id="korean-word-input" 
                         placeholder="한국어 단어를 입력하세요 (예: 사랑해)"
                         autocomplete="off"
+                        tabindex="1"
+                        aria-label="한국어 단어 입력"
+                        maxlength="50"
                     >
                     <button 
                         id="generate-btn" 
                         class="generate-btn"
                         onclick="generateVocabulary()"
+                        tabindex="2"
+                        aria-label="어휘 생성하기"
                     >
                         🔍 생성하기
                     </button>
@@ -71,7 +76,7 @@
                 <div class="vocabulary-card">
                     <div class="card-header">
                         <h2 id="original-word">-</h2>
-                        <button onclick="playPronunciation()" class="play-btn">🔊</button>
+                        <button onclick="playPronunciation()" class="play-btn" tabindex="3" aria-label="발음 듣기">🔊</button>
                     </div>
                     
                     <div class="translation-info">
@@ -91,8 +96,8 @@
                     </div>
 
                     <div class="card-actions">
-                        <button onclick="saveVocabulary()" class="save-btn">💾 노트에 저장</button>
-                        <button onclick="clearResult()" class="clear-btn">🗑️ 지우기</button>
+                        <button onclick="saveVocabulary()" class="save-btn" tabindex="4" aria-label="노트에 저장">💾 노트에 저장</button>
+                        <button onclick="clearResult()" class="clear-btn" tabindex="5" aria-label="결과 지우기">🗑️ 지우기</button>
                     </div>
                 </div>
             </section>
@@ -101,7 +106,7 @@
             <section class="vocabulary-list">
                 <div class="list-header">
                     <h3>📚 저장된 어휘 ({{ vocabulary_count }}개)</h3>
-                    <button onclick="refreshVocabularyList()" class="refresh-btn">🔄 새로고침</button>
+                    <button onclick="refreshVocabularyList()" class="refresh-btn" tabindex="6" aria-label="어휘 목록 새로고침">🔄 새로고침</button>
                 </div>
                 
                 <div id="vocabulary-list-container" class="vocabulary-items">
@@ -269,7 +274,7 @@
         // 온라인/오프라인 상태 감지
         window.addEventListener('online', () => {
             console.log('🌐 온라인 상태');
-            showNotification('인터넷에 연결되었습니다', 'success');
+            // showNotification('인터넷에 연결되었습니다', 'success'); // constants.js import 후 SUCCESS_MESSAGES.NETWORK_RESTORED 사용 가능
         });
 
         window.addEventListener('offline', () => {
@@ -283,7 +288,7 @@
             
             // 저장된 테마 로드 또는 시스템 테마 감지
             function loadTheme() {
-                const savedTheme = localStorage.getItem('theme');
+                const savedTheme = localStorage.getItem('theme'); // constants.js 사용시 STORAGE_KEYS.THEME로 대체 가능
                 const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
                 const currentTheme = savedTheme || systemTheme;
                 
@@ -294,7 +299,7 @@
             // 테마 설정
             function setTheme(theme) {
                 document.documentElement.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
+                localStorage.setItem('theme', theme); // constants.js 사용시 STORAGE_KEYS.THEME로 대체 가능
                 
                 // 버튼 아이콘 업데이트
                 if (themeToggleBtn) {
@@ -321,15 +326,15 @@
                 setTheme(newTheme);
                 
                 // 테마 변경 알림
-                showNotification(
-                    `${newTheme === 'dark' ? '다크' : '라이트'}모드로 전환되었습니다`, 
-                    'success'
-                );
+                // showNotification(
+                //     `${newTheme === 'dark' ? '다크' : '라이트'}모드로 전환되었습니다`, 
+                //     'success'
+                // ); // constants.js import 후 SUCCESS_MESSAGES.THEME_CHANGED 사용 가능
             }
             
             // 시스템 테마 변경 감지
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                if (!localStorage.getItem('theme')) {
+                if (!localStorage.getItem('theme')) { // constants.js 사용시 STORAGE_KEYS.THEME로 대체 가능
                     setTheme(e.matches ? 'dark' : 'light');
                 }
             });
@@ -400,6 +405,6 @@
         });
     </script>
 
-    <script src="/static/script.js"></script>
+    <script type="module" src="/static/script.js"></script>
 </body>
 </html>

@@ -1,3 +1,6 @@
+// 상수 import
+import { STORAGE_KEYS, API_ENDPOINTS, VALIDATION, ERROR_MESSAGES, SUCCESS_MESSAGES, UI_CONSTANTS } from './constants.js';
+
 // 전역 변수
 let currentVocabularyData = null;
 
@@ -5,9 +8,28 @@ let currentVocabularyData = null;
 document.addEventListener('DOMContentLoaded', function() {
     // 엔터키로 어휘 생성
     const input = document.getElementById('korean-word-input');
+    const generateBtn = document.getElementById('generate-btn');
+    
+    // Enter 키 이벤트 처리
     input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && !generateBtn.disabled) {
+            e.preventDefault();
             generateVocabulary();
+        }
+    });
+    
+    // 실시간 입력 유효성 검사
+    input.addEventListener('input', function(e) {
+        const validation = validateKoreanInput(e.target.value);
+        const inputElement = e.target;
+        
+        // 입력 필드 스타일링
+        if (e.target.value.trim() && !validation.valid) {
+            inputElement.style.borderColor = '#f44336';
+            inputElement.title = validation.message;
+        } else {
+            inputElement.style.borderColor = '';
+            inputElement.title = '';
         }
     });
     
@@ -15,13 +37,38 @@ document.addEventListener('DOMContentLoaded', function() {
     refreshVocabularyList();
 });
 
+// 입력 유효성 검사 함수
+function validateKoreanInput(word) {
+    if (!word || word.trim() === '') {
+        return { valid: false, message: ERROR_MESSAGES.EMPTY_INPUT };
+    }
+    
+    const trimmedWord = word.trim();
+    
+    if (trimmedWord.length < VALIDATION.MIN_WORD_LENGTH) {
+        return { valid: false, message: ERROR_MESSAGES.TOO_SHORT };
+    }
+    
+    if (trimmedWord.length > VALIDATION.MAX_WORD_LENGTH) {
+        return { valid: false, message: ERROR_MESSAGES.TOO_LONG };
+    }
+    
+    if (!VALIDATION.KOREAN_REGEX.test(trimmedWord)) {
+        return { valid: false, message: ERROR_MESSAGES.INVALID_KOREAN };
+    }
+    
+    return { valid: true, word: trimmedWord };
+}
+
 // 어휘 생성 함수
 async function generateVocabulary() {
     const input = document.getElementById('korean-word-input');
     const word = input.value.trim();
     
-    if (!word) {
-        alert('한국어 단어를 입력해주세요!');
+    // 향상된 입력 유효성 검사
+    const validation = validateKoreanInput(word);
+    if (!validation.valid) {
+        showNotification(validation.message, 'error');
         input.focus();
         return;
     }
@@ -32,7 +79,7 @@ async function generateVocabulary() {
     disableGenerateButton(true);
     
     try {
-        const response = await fetch('/api/generate-vocabulary', {
+        const response = await fetch(API_ENDPOINTS.GENERATE_VOCABULARY, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -48,13 +95,22 @@ async function generateVocabulary() {
             currentVocabularyData = data.data;
             displayVocabularyResult(data.data);
             showResult();
+            showNotification(SUCCESS_MESSAGES.VOCABULARY_GENERATED, 'success');
         } else {
-            throw new Error(data.error || '어휘 생성에 실패했습니다.');
+            throw new Error(data.error || ERROR_MESSAGES.GENERATION_FAILED);
         }
         
     } catch (error) {
         console.error('Error:', error);
-        alert('오류: ' + error.message);
+        let errorMessage = ERROR_MESSAGES.GENERATION_FAILED;
+        
+        if (error.name === 'TypeError' || error.message.includes('fetch')) {
+            errorMessage = ERROR_MESSAGES.NETWORK_ERROR;
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        
+        showNotification(errorMessage, 'error');
     } finally {
         showLoading(false);
         disableGenerateButton(false);
@@ -186,19 +242,19 @@ function playKoreanText(text, exampleIndex = null) {
 
 // 재생 속도 가져오기 (localStorage에서)
 function getPlaybackRate() {
-    const savedRate = localStorage.getItem('tts-playback-rate');
+    const savedRate = localStorage.getItem(STORAGE_KEYS.TTS_PLAYBACK_RATE);
     return savedRate ? parseFloat(savedRate) : 0.8; // 기본값 0.8 (조금 느리게)
 }
 
 // 재생 속도 설정
 function setPlaybackRate(rate) {
-    localStorage.setItem('tts-playback-rate', rate.toString());
+    localStorage.setItem(STORAGE_KEYS.TTS_PLAYBACK_RATE, rate.toString());
 }
 
 // 어휘 저장 (이미 자동으로 저장되므로 알림만)
 function saveVocabulary() {
     if (currentVocabularyData) {
-        alert('✅ 어휘가 노트에 저장되었습니다!');
+        showNotification(SUCCESS_MESSAGES.VOCABULARY_SAVED, 'success');
         refreshVocabularyList();
     }
 }
@@ -214,7 +270,7 @@ function clearResult() {
 // 저장된 어휘 목록 새로고침
 async function refreshVocabularyList() {
     try {
-        const response = await fetch('/api/vocabulary');
+        const response = await fetch(API_ENDPOINTS.VOCABULARY);
         const vocabularyList = await response.json();
         
         const container = document.getElementById('vocabulary-list-container');
@@ -254,13 +310,14 @@ async function refreshVocabularyList() {
         
     } catch (error) {
         console.error('Error refreshing vocabulary list:', error);
+        showNotification(ERROR_MESSAGES.LOAD_FAILED, 'error');
     }
 }
 
 // 어휘 상세보기
 async function showVocabularyDetail(word) {
     try {
-        const response = await fetch(`/api/vocabulary/${encodeURIComponent(word)}`);
+        const response = await fetch(`${API_ENDPOINTS.VOCABULARY}/${encodeURIComponent(word)}`);
         const data = await response.json();
         
         if (data) {
@@ -268,7 +325,7 @@ async function showVocabularyDetail(word) {
         }
     } catch (error) {
         console.error('Error showing vocabulary detail:', error);
-        alert('어휘 정보를 불러올 수 없습니다.');
+        showNotification(ERROR_MESSAGES.LOAD_FAILED, 'error');
     }
 }
 
@@ -336,21 +393,21 @@ async function deleteVocabulary(word) {
     }
     
     try {
-        const response = await fetch(`/api/vocabulary/${encodeURIComponent(word)}`, {
+        const response = await fetch(`${API_ENDPOINTS.VOCABULARY}/${encodeURIComponent(word)}`, {
             method: 'DELETE'
         });
         
         const result = await response.json();
         
         if (result.success) {
-            alert('✅ 단어가 삭제되었습니다.');
+            showNotification(SUCCESS_MESSAGES.VOCABULARY_DELETED, 'success');
             refreshVocabularyList();
         } else {
-            throw new Error('삭제에 실패했습니다.');
+            throw new Error(ERROR_MESSAGES.DELETE_FAILED);
         }
     } catch (error) {
         console.error('Error deleting vocabulary:', error);
-        alert('삭제 중 오류가 발생했습니다.');
+        showNotification(ERROR_MESSAGES.DELETE_FAILED, 'error');
     }
 }
 
@@ -412,7 +469,7 @@ document.getElementById('modal').addEventListener('click', function(e) {
     }
 });
 
-// 간단한 알림 시스템
+// 향상된 알림 시스템
 function showNotification(message, type = 'info') {
     // 기존 알림 제거
     const existingNotification = document.querySelector('.notification');
@@ -424,11 +481,21 @@ function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.textContent = message;
+    notification.setAttribute('role', 'alert');
+    notification.setAttribute('aria-live', 'polite');
+    
+    const colors = {
+        success: '#4CAF50',
+        error: '#f44336', 
+        warning: '#ff9800',
+        info: '#2196F3'
+    };
+    
     notification.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
-        background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+        background: ${colors[type] || colors.info};
         color: white;
         padding: 15px 25px;
         border-radius: 25px;
@@ -438,16 +505,27 @@ function showNotification(message, type = 'info') {
         max-width: 300px;
         word-wrap: break-word;
         animation: slideInRight 0.3s ease;
+        cursor: pointer;
     `;
+    
+    // 클릭으로 알림 닫기
+    notification.addEventListener('click', () => {
+        notification.remove();
+    });
     
     document.body.appendChild(notification);
     
-    // 3초 후 자동 제거
+    // 설정된 시간 후 자동 제거
     setTimeout(() => {
         if (notification.parentNode) {
-            notification.remove();
+            notification.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
         }
-    }, 3000);
+    }, UI_CONSTANTS.NOTIFICATION_DURATION);
 }
 
 // CSS 애니메이션 추가
@@ -462,6 +540,22 @@ style.textContent = `
             transform: translateX(0);
             opacity: 1;
         }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+    
+    .notification:hover {
+        transform: scale(1.02);
+        transition: transform 0.2s ease;
     }
 `;
 document.head.appendChild(style);
