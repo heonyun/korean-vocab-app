@@ -1,3 +1,75 @@
+/* CSS 변수 - 라이트 테마 */
+:root {
+    /* 색상 변수 */
+    --bg-gradient-start: #667eea;
+    --bg-gradient-end: #764ba2;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --text-muted: #999999;
+    --text-white: #ffffff;
+    --text-on-primary: #ffffff;
+    
+    /* 배경 색상 */
+    --bg-main: rgba(255, 255, 255, 0.95);
+    --bg-card: #ffffff;
+    --bg-overlay: rgba(0, 0, 0, 0.7);
+    --bg-input: #ffffff;
+    --bg-secondary: #f8f9fa;
+    
+    /* 테두리 색상 */
+    --border-light: #e0e0e0;
+    --border-focus: #667eea;
+    
+    /* 버튼 색상 */
+    --btn-primary: #667eea;
+    --btn-primary-hover: #5a6fd8;
+    --btn-secondary: #4CAF50;
+    --btn-secondary-hover: #45a049;
+    --btn-danger: #f44336;
+    --btn-danger-hover: #da190b;
+    
+    /* 그림자 */
+    --shadow-light: 0 2px 5px rgba(0,0,0,0.1);
+    --shadow-medium: 0 5px 15px rgba(0,0,0,0.15);
+    --shadow-heavy: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+/* 다크 테마 */
+[data-theme="dark"] {
+    /* 색상 변수 */
+    --bg-gradient-start: #1a1a2e;
+    --bg-gradient-end: #16213e;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --text-muted: #8a8a8a;
+    --text-white: #ffffff;
+    --text-on-primary: #ffffff;
+    
+    /* 배경 색상 */
+    --bg-main: rgba(42, 42, 60, 0.95);
+    --bg-card: #2a2a3c;
+    --bg-overlay: rgba(0, 0, 0, 0.8);
+    --bg-input: #3a3a4c;
+    --bg-secondary: #353548;
+    
+    /* 테두리 색상 */
+    --border-light: #4a4a5c;
+    --border-focus: #8b9fff;
+    
+    /* 버튼 색상 */
+    --btn-primary: #8b9fff;
+    --btn-primary-hover: #7a8eff;
+    --btn-secondary: #66bb6a;
+    --btn-secondary-hover: #5cb85c;
+    --btn-danger: #f77;
+    --btn-danger-hover: #f55;
+    
+    /* 그림자 */
+    --shadow-light: 0 2px 5px rgba(0,0,0,0.3);
+    --shadow-medium: 0 5px 15px rgba(0,0,0,0.4);
+    --shadow-heavy: 0 15px 35px rgba(0,0,0,0.5);
+}
+
 /* 기본 설정 */
 * {
     margin: 0;
@@ -8,9 +80,10 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
-    color: #333;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
     min-height: 100vh;
+    transition: all 0.3s ease;
 }
 
 .container {
@@ -76,11 +149,12 @@ body {
 
 /* 메인 콘텐츠 */
 .main-content {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--bg-main);
     border-radius: 20px;
     padding: 2rem;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    box-shadow: var(--shadow-heavy);
     backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
 }
 
 /* 입력 섹션 */
@@ -98,22 +172,28 @@ body {
     flex: 1;
     padding: 15px 20px;
     font-size: 1.1rem;
-    border: 2px solid #e0e0e0;
+    border: 2px solid var(--border-light);
     border-radius: 25px;
     outline: none;
     transition: all 0.3s ease;
+    background: var(--bg-input);
+    color: var(--text-primary);
 }
 
 #korean-word-input:focus {
-    border-color: #667eea;
+    border-color: var(--border-focus);
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+#korean-word-input::placeholder {
+    color: var(--text-muted);
 }
 
 .generate-btn {
     padding: 15px 30px;
     font-size: 1.1rem;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
+    background: linear-gradient(135deg, var(--btn-primary), var(--btn-primary-hover));
+    color: var(--text-on-primary);
     border: none;
     border-radius: 25px;
     cursor: pointer;
@@ -136,15 +216,15 @@ body {
 .loading {
     text-align: center;
     padding: 1rem;
-    color: #667eea;
+    color: var(--btn-primary);
     font-weight: 500;
 }
 
 .spinner {
     width: 30px;
     height: 30px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #667eea;
+    border: 3px solid var(--border-light);
+    border-top: 3px solid var(--btn-primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 10px;
@@ -161,11 +241,12 @@ body {
 }
 
 .vocabulary-card {
-    background: white;
+    background: var(--bg-card);
     border-radius: 15px;
     padding: 2rem;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    border-left: 5px solid #667eea;
+    box-shadow: var(--shadow-medium);
+    border-left: 5px solid var(--btn-primary);
+    transition: all 0.3s ease;
 }
 
 .card-header {
@@ -177,13 +258,13 @@ body {
 
 .card-header h2 {
     font-size: 2rem;
-    color: #333;
+    color: var(--text-primary);
     margin: 0;
 }
 
 .play-btn {
-    background: #4CAF50;
-    color: white;
+    background: var(--btn-secondary);
+    color: var(--text-on-primary);
     border: none;
     border-radius: 50%;
     width: 45px;
@@ -194,15 +275,16 @@ body {
 }
 
 .play-btn:hover {
-    background: #45a049;
+    background: var(--btn-secondary-hover);
     transform: scale(1.1);
 }
 
 .translation-info {
-    background: #f8f9fa;
+    background: var(--bg-secondary);
     padding: 1.5rem;
     border-radius: 10px;
     margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
 }
 
 .translation-info > div {
@@ -219,19 +301,19 @@ body {
 
 .pronunciation {
     font-size: 1.1rem;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 /* 활용 예제 */
 .usage-examples h3 {
-    color: #667eea;
+    color: var(--btn-primary);
     margin-bottom: 1rem;
     font-size: 1.3rem;
 }
 
 .example-item {
-    background: #fff;
-    border: 1px solid #e0e0e0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
     border-radius: 10px;
     padding: 1rem;
     margin-bottom: 1rem;
@@ -239,7 +321,7 @@ body {
 }
 
 .example-item:hover {
-    border-color: #667eea;
+    border-color: var(--border-focus);
     box-shadow: 0 2px 10px rgba(102, 126, 234, 0.1);
 }
 
@@ -254,13 +336,13 @@ body {
 .example-korean {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
     flex: 1;
 }
 
 .example-play-btn {
-    background: #4CAF50;
-    color: white;
+    background: var(--btn-secondary);
+    color: var(--text-on-primary);
     border: none;
     border-radius: 50%;
     width: 32px;
@@ -275,7 +357,7 @@ body {
 }
 
 .example-play-btn:hover {
-    background: #45a049;
+    background: var(--btn-secondary-hover);
     transform: scale(1.1);
 }
 
@@ -292,7 +374,7 @@ body {
 
 .example-russian {
     font-size: 1rem;
-    color: #666;
+    color: var(--text-secondary);
     margin-bottom: 0.5rem;
 }
 
@@ -343,22 +425,22 @@ body {
 }
 
 .save-btn {
-    background: #4CAF50;
-    color: white;
+    background: var(--btn-secondary);
+    color: var(--text-on-primary);
 }
 
 .save-btn:hover {
-    background: #45a049;
+    background: var(--btn-secondary-hover);
     transform: translateY(-1px);
 }
 
 .clear-btn {
-    background: #f44336;
-    color: white;
+    background: var(--btn-danger);
+    color: var(--text-on-primary);
 }
 
 .clear-btn:hover {
-    background: #da190b;
+    background: var(--btn-danger-hover);
     transform: translateY(-1px);
 }
 
@@ -375,13 +457,13 @@ body {
 }
 
 .list-header h3 {
-    color: #333;
+    color: var(--text-primary);
     font-size: 1.5rem;
 }
 
 .refresh-btn {
-    background: #2196F3;
-    color: white;
+    background: var(--btn-primary);
+    color: var(--text-on-primary);
     border: none;
     border-radius: 15px;
     padding: 8px 16px;
@@ -391,7 +473,7 @@ body {
 }
 
 .refresh-btn:hover {
-    background: #1976D2;
+    background: var(--btn-primary-hover);
 }
 
 .vocabulary-items {
@@ -401,16 +483,16 @@ body {
 }
 
 .vocabulary-item {
-    background: white;
+    background: var(--bg-card);
     border-radius: 10px;
     padding: 1rem;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-light);
     transition: all 0.3s ease;
 }
 
 .vocabulary-item:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    box-shadow: var(--shadow-medium);
 }
 
 .item-header {
@@ -423,12 +505,12 @@ body {
 .korean-word {
     font-size: 1.2rem;
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .russian-word {
     font-size: 1rem;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 .item-actions {
@@ -446,27 +528,27 @@ body {
 }
 
 .detail-btn {
-    background: #2196F3;
-    color: white;
+    background: var(--btn-primary);
+    color: var(--text-on-primary);
 }
 
 .detail-btn:hover {
-    background: #1976D2;
+    background: var(--btn-primary-hover);
 }
 
 .delete-btn {
-    background: #f44336;
-    color: white;
+    background: var(--btn-danger);
+    color: var(--text-on-primary);
 }
 
 .delete-btn:hover {
-    background: #da190b;
+    background: var(--btn-danger-hover);
 }
 
 /* 빈 상태 */
 .empty-state {
     text-align: center;
-    color: #999;
+    color: var(--text-muted);
     padding: 2rem;
 }
 
@@ -486,7 +568,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.7);
+    background: var(--bg-overlay);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -494,7 +576,7 @@ body {
 }
 
 .modal-content {
-    background: white;
+    background: var(--bg-card);
     border-radius: 15px;
     padding: 2rem;
     max-width: 600px;
@@ -502,6 +584,7 @@ body {
     max-height: 80vh;
     overflow-y: auto;
     position: relative;
+    transition: all 0.3s ease;
 }
 
 .close-btn {
@@ -510,14 +593,14 @@ body {
     right: 20px;
     font-size: 2rem;
     cursor: pointer;
-    color: #999;
+    color: var(--text-muted);
     transition: color 0.3s ease;
     background: none;
     border: none;
 }
 
 .close-btn:hover {
-    color: #333;
+    color: var(--text-primary);
 }
 
 /* 음성 설정 패널 */
@@ -527,7 +610,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.7);
+    background: var(--bg-overlay);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -535,17 +618,18 @@ body {
 }
 
 .settings-content {
-    background: white;
+    background: var(--bg-card);
     border-radius: 15px;
     padding: 0;
     max-width: 400px;
     width: 90%;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: var(--shadow-heavy);
+    transition: all 0.3s ease;
 }
 
 .settings-header {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
+    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+    color: var(--text-on-primary);
     padding: 1.5rem;
     border-radius: 15px 15px 0 0;
     display: flex;
@@ -560,7 +644,7 @@ body {
 
 .settings-header .close-btn {
     position: static;
-    color: white;
+    color: var(--text-on-primary);
     font-size: 1.5rem;
     background: rgba(255,255,255,0.2);
     border-radius: 50%;
@@ -591,7 +675,7 @@ body {
     display: block;
     font-weight: 600;
     margin-bottom: 0.5rem;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .slider-container {
@@ -604,7 +688,7 @@ body {
 #playback-rate-slider {
     flex: 1;
     height: 8px;
-    background: #e0e0e0;
+    background: var(--border-light);
     border-radius: 5px;
     outline: none;
     cursor: pointer;
@@ -614,7 +698,7 @@ body {
     appearance: none;
     width: 20px;
     height: 20px;
-    background: #667eea;
+    background: var(--btn-primary);
     border-radius: 50%;
     cursor: pointer;
 }
@@ -622,7 +706,7 @@ body {
 #playback-rate-slider::-moz-range-thumb {
     width: 20px;
     height: 20px;
-    background: #667eea;
+    background: var(--btn-primary);
     border-radius: 50%;
     cursor: pointer;
     border: none;
@@ -630,7 +714,7 @@ body {
 
 #playback-rate-value {
     font-weight: 600;
-    color: #667eea;
+    color: var(--btn-primary);
     min-width: 40px;
     text-align: center;
 }
@@ -643,8 +727,9 @@ body {
 
 .speed-preset {
     padding: 0.5rem 1rem;
-    border: 2px solid #e0e0e0;
-    background: white;
+    border: 2px solid var(--border-light);
+    background: var(--bg-card);
+    color: var(--text-primary);
     border-radius: 20px;
     cursor: pointer;
     font-size: 0.9rem;
@@ -652,19 +737,19 @@ body {
 }
 
 .speed-preset:hover {
-    border-color: #667eea;
-    background: #f0f4ff;
+    border-color: var(--border-focus);
+    background: var(--bg-secondary);
 }
 
 .speed-preset.active {
-    border-color: #667eea;
-    background: #667eea;
-    color: white;
+    border-color: var(--btn-primary);
+    background: var(--btn-primary);
+    color: var(--text-on-primary);
 }
 
 .test-btn {
-    background: #4CAF50;
-    color: white;
+    background: var(--btn-secondary);
+    color: var(--text-on-primary);
     border: none;
     padding: 0.75rem 1.5rem;
     border-radius: 25px;
@@ -676,7 +761,7 @@ body {
 }
 
 .test-btn:hover {
-    background: #45a049;
+    background: var(--btn-secondary-hover);
     transform: translateY(-1px);
 }
 
