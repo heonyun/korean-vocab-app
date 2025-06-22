@@ -37,7 +37,7 @@ if GOOGLE_API_KEY:
 - 문법 변화형 (과거/현재/미래, 높임말/반말)
 - 상황별 활용 (전화, 메시지, 대면 대화)
 
-각 예제마다 러시아어 번역과 간단한 문법 설명, 사용 상황을 포함해주세요.
+각 예제마다 러시아어 번역과 문법 설명(한국어와 러시아어 둘 다), 사용 상황을 포함해주세요.
 모든 응답은 연인 관계의 자연스러운 대화 맥락에서 사용 가능해야 합니다."""
         )
     except Exception as e:
@@ -63,6 +63,7 @@ async def generate_vocabulary_entry(korean_word: str) -> VocabularyEntry:
         - korean_sentence: 한국어 문장
         - russian_translation: 러시아어 번역
         - grammar_note: 문법 설명 (한국어로)
+        - grammar_note_russian: 문법 설명 (러시아어로)
         - context: 사용 상황 (예: "전화통화시", "메시지 보낼때", "직접 만났을때")
 
         응답은 반드시 JSON 형식으로 VocabularyEntry 모델에 맞춰 작성해주세요.
@@ -97,18 +98,21 @@ async def generate_vocabulary_fallback(korean_word: str) -> VocabularyEntry:
                     "korean_sentence": "예문1",
                     "russian_translation": "러시아어 번역1",
                     "grammar_note": "문법 설명1",
+                    "grammar_note_russian": "грамматическое объяснение 1",
                     "context": "사용 상황1"
                 }},
                 {{
                     "korean_sentence": "예문2", 
                     "russian_translation": "러시아어 번역2",
                     "grammar_note": "문법 설명2",
+                    "grammar_note_russian": "грамматическое объяснение 2",
                     "context": "사용 상황2"
                 }},
                 {{
                     "korean_sentence": "예문3",
                     "russian_translation": "러시아어 번역3", 
                     "grammar_note": "문법 설명3",
+                    "grammar_note_russian": "грамматическое объяснение 3",
                     "context": "사용 상황3"
                 }}
             ]
@@ -148,18 +152,21 @@ def create_basic_entry(korean_word: str, error_info: str = "") -> VocabularyEntr
                 korean_sentence=f"{korean_word}를 사용해보세요",
                 russian_translation="Попробуйте использовать это слово",
                 grammar_note="기본 사용법",
+                grammar_note_russian="базовое использование",
                 context="일반적인 상황"
             ),
             UsageExample(
                 korean_sentence=f"정말 {korean_word}네요",
                 russian_translation="Действительно...",
                 grammar_note="감탄 표현",
+                grammar_note_russian="восклицательное выражение",
                 context="감정 표현시"
             ),
             UsageExample(
                 korean_sentence=f"{korean_word}라고 생각해요",
                 russian_translation="Я думаю, что...",
                 grammar_note="의견 표현",
+                grammar_note_russian="выражение мнения",
                 context="의견을 말할 때"
             )
         ]

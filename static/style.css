@@ -226,8 +226,22 @@ body {
 }
 
 .example-grammar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.grammar-korean {
     color: #9c27b0;
     font-style: italic;
+    font-weight: 500;
+}
+
+.grammar-russian {
+    color: #6a4c93;
+    font-style: italic;
+    font-size: 0.85em;
+    opacity: 0.9;
 }
 
 .example-context {

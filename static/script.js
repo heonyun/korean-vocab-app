@@ -78,7 +78,10 @@ function displayVocabularyResult(data) {
             <div class="example-korean">${example.korean_sentence}</div>
             <div class="example-russian">${example.russian_translation}</div>
             <div class="example-meta">
-                <span class="example-grammar">${example.grammar_note}</span>
+                <div class="example-grammar">
+                    <span class="grammar-korean">${example.grammar_note}</span>
+                    <span class="grammar-russian">${example.grammar_note_russian || ''}</span>
+                </div>
                 <span class="example-context">${example.context}</span>
             </div>
         `;
@@ -188,7 +191,10 @@ function createVocabularyDetailHTML(data) {
                 <div class="example-korean">${example.korean_sentence}</div>
                 <div class="example-russian">${example.russian_translation}</div>
                 <div class="example-meta">
-                    <span class="example-grammar">${example.grammar_note}</span>
+                    <div class="example-grammar">
+                        <span class="grammar-korean">${example.grammar_note}</span>
+                        <span class="grammar-russian">${example.grammar_note_russian || ''}</span>
+                    </div>
                     <span class="example-context">${example.context}</span>
                 </div>
             </div>

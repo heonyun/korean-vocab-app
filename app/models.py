@@ -6,6 +6,7 @@ class UsageExample(BaseModel):
     korean_sentence: str
     russian_translation: str
     grammar_note: str
+    grammar_note_russian: str  # 러시아어 문법 설명 추가
     context: str
 
 class VocabularyEntry(BaseModel):
