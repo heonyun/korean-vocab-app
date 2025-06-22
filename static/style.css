@@ -449,6 +449,153 @@ body {
     font-size: 0.9rem;
 }
 
+/* PWA 설치 배너 */
+.pwa-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 1rem;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+    z-index: 10000;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+}
+
+.pwa-banner.hidden {
+    transform: translateY(100%);
+}
+
+.pwa-banner-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 1rem;
+}
+
+.pwa-banner-text h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.pwa-banner-text p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.pwa-banner-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.pwa-install-btn,
+.pwa-dismiss-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 20px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.pwa-install-btn {
+    background: white;
+    color: #667eea;
+}
+
+.pwa-install-btn:hover {
+    background: #f0f0f0;
+    transform: translateY(-1px);
+}
+
+.pwa-dismiss-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.pwa-dismiss-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* PWA 전용 스타일 (설치된 앱에서) */
+@media (display-mode: standalone) {
+    .header {
+        padding-top: env(safe-area-inset-top);
+    }
+    
+    .container {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    /* PWA에서는 설치 배너 숨김 */
+    .pwa-banner {
+        display: none;
+    }
+}
+
+/* iOS Safari PWA 지원 */
+@media (display-mode: standalone) and (-webkit-touch-callout: none) {
+    .header {
+        padding-top: max(env(safe-area-inset-top), 20px);
+    }
+}
+
+/* 오프라인 상태 표시 */
+.offline-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #ff9800;
+    color: white;
+    text-align: center;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    z-index: 9999;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+}
+
+.offline-indicator.show {
+    transform: translateY(0);
+}
+
+/* PWA 스플래시 화면 최적화 */
+.loading-splash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 99999;
+}
+
+.loading-splash h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.loading-splash .spinner {
+    border-color: rgba(255,255,255,0.3);
+    border-top-color: white;
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .container {

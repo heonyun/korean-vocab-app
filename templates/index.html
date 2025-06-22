@@ -4,6 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>한국어 어휘 학습 노트</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="한국어학습">
+    <meta name="msapplication-TileColor" content="#667eea">
+    <meta name="msapplication-config" content="/static/browserconfig.xml">
+    
+    <!-- iOS Icons -->
+    <link rel="apple-touch-icon" sizes="152x152" href="/static/icons/icon-152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/icon-180.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png">
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -113,6 +134,112 @@
             </div>
         </div>
     </div>
+
+    <!-- PWA Install Prompt -->
+    <div id="pwa-install-banner" class="pwa-banner hidden">
+        <div class="pwa-banner-content">
+            <div class="pwa-banner-text">
+                <h3>📱 앱으로 설치하기</h3>
+                <p>홈화면에 추가하여 더 빠르게 접근하세요!</p>
+            </div>
+            <div class="pwa-banner-actions">
+                <button id="pwa-install-btn" class="pwa-install-btn">설치</button>
+                <button id="pwa-dismiss-btn" class="pwa-dismiss-btn">나중에</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA Scripts -->
+    <script>
+        // Service Worker 등록
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    console.log('🎉 Service Worker 등록 성공:', registration.scope);
+                    
+                    // 업데이트 확인
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // 새 버전 업데이트 알림
+                                showUpdateNotification();
+                            }
+                        });
+                    });
+                } catch (error) {
+                    console.error('❌ Service Worker 등록 실패:', error);
+                }
+            });
+        }
+
+        // PWA 설치 프롬프트
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('💡 PWA 설치 프롬프트 표시 가능');
+            e.preventDefault();
+            deferredPrompt = e;
+            showInstallBanner();
+        });
+
+        function showInstallBanner() {
+            const banner = document.getElementById('pwa-install-banner');
+            const installBtn = document.getElementById('pwa-install-btn');
+            const dismissBtn = document.getElementById('pwa-dismiss-btn');
+            
+            if (banner) {
+                banner.classList.remove('hidden');
+                
+                installBtn.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`PWA 설치 결과: ${outcome}`);
+                        deferredPrompt = null;
+                        hideInstallBanner();
+                    }
+                });
+                
+                dismissBtn.addEventListener('click', () => {
+                    hideInstallBanner();
+                });
+            }
+        }
+
+        function hideInstallBanner() {
+            const banner = document.getElementById('pwa-install-banner');
+            if (banner) {
+                banner.classList.add('hidden');
+            }
+        }
+
+        // 앱 설치 완료 감지
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('🎉 PWA 설치 완료!');
+            hideInstallBanner();
+            showNotification('앱이 성공적으로 설치되었습니다!', 'success');
+        });
+
+        // 업데이트 알림
+        function showUpdateNotification() {
+            if (confirm('새 버전이 사용 가능합니다. 업데이트하시겠습니까?')) {
+                window.location.reload();
+            }
+        }
+
+        // 온라인/오프라인 상태 감지
+        window.addEventListener('online', () => {
+            console.log('🌐 온라인 상태');
+            showNotification('인터넷에 연결되었습니다', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            console.log('📵 오프라인 상태');
+            showNotification('오프라인 모드입니다. 저장된 어휘는 계속 볼 수 있습니다', 'info');
+        });
+    </script>
 
     <script src="/static/script.js"></script>
 </body>

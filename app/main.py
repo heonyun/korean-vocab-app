@@ -1,9 +1,10 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 from typing import List
 import logging
+import os
 
 from .models import VocabularyRequest, VocabularyResponse, VocabularyEntry
 from .ai_service import generate_vocabulary_entry, generate_vocabulary_fallback
@@ -34,6 +35,45 @@ async def home(request: Request):
             "request": request, 
             "vocabulary_count": len(vocabulary_list),
             "vocabulary_list": vocabulary_list[-10:]  # 최근 10개만 표시
+        }
+    )
+
+# PWA 관련 라우트들
+@app.get("/manifest.json")
+async def get_manifest():
+    """PWA Manifest 파일 제공"""
+    return FileResponse(
+        "static/manifest.json",
+        media_type="application/manifest+json",
+        headers={
+            "Cache-Control": "public, max-age=604800",  # 1주일 캐싱
+            "Cross-Origin-Embedder-Policy": "credentialless"
+        }
+    )
+
+@app.get("/sw.js")
+async def get_service_worker():
+    """Service Worker 파일 제공"""
+    return FileResponse(
+        "static/sw.js",
+        media_type="application/javascript",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",  # SW는 캐싱 안함
+            "Service-Worker-Allowed": "/",
+            "Cross-Origin-Embedder-Policy": "credentialless"
+        }
+    )
+
+@app.get("/offline")
+async def offline_page(request: Request):
+    """오프라인 페이지"""
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "vocabulary_count": 0,
+            "vocabulary_list": [],
+            "offline": True
         }
     )
 
