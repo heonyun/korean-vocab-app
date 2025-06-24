@@ -2,6 +2,12 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 
+class SpellCheckInfo(BaseModel):
+    original_word: str
+    corrected_word: str
+    has_spelling_error: bool
+    correction_note: Optional[str] = None
+
 class UsageExample(BaseModel):
     korean_sentence: str
     russian_translation: str
@@ -15,6 +21,7 @@ class VocabularyEntry(BaseModel):
     russian_translation: str
     pronunciation: str
     usage_examples: List[UsageExample]
+    spelling_check: Optional[SpellCheckInfo] = None
     created_at: Optional[datetime] = None
     
     class Config:
