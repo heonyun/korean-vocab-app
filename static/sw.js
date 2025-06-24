@@ -1,7 +1,8 @@
 // Service Worker for Korean Vocabulary Learning App
-const CACHE_NAME = 'korean-vocab-v1.0.0';
-const STATIC_CACHE = 'static-v1.0.0';
-const DYNAMIC_CACHE = 'dynamic-v1.0.0';
+// Samsung Internet 호환성 개선
+const CACHE_NAME = 'korean-vocab-v1.0.1';
+const STATIC_CACHE = 'static-v1.0.1';
+const DYNAMIC_CACHE = 'dynamic-v1.0.1';
 
 // 캐시할 정적 리소스 목록
 const STATIC_ASSETS = [
@@ -9,7 +10,9 @@ const STATIC_ASSETS = [
   '/static/style.css',
   '/static/script.js',
   '/static/manifest.json',
-  // 폰트 및 기타 정적 리소스는 필요시 추가
+  '/static/icons/icon-192.png',
+  '/static/icons/icon-512.png',
+  // Samsung Internet 호환성을 위한 필수 아이콘 추가
 ];
 
 // 캐시할 API 엔드포인트 패턴
