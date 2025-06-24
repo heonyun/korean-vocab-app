@@ -769,8 +769,24 @@ body {
 .footer {
     text-align: center;
     margin-top: 2rem;
-    color: rgba(255,255,255,0.8);
+    margin-bottom: 2rem;
+    color: var(--text-secondary);
     font-size: 0.9rem;
+    padding: 1rem 0;
+    z-index: 1;
+    position: relative;
+}
+
+.footer p {
+    margin: 0.5rem 0;
+    line-height: 1.4;
+}
+
+.footer p:last-child {
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: 10px;
+    opacity: 0.8;
 }
 
 /* PWA 설치 배너 */
@@ -848,6 +864,19 @@ body {
 
 .pwa-dismiss-btn:hover {
     background: rgba(255,255,255,0.3);
+}
+
+/* PWA 배너와 footer 충돌 방지 */
+body:has(.pwa-banner:not(.hidden)) .footer {
+    margin-bottom: 120px; /* PWA 배너 높이 + 여백 */
+}
+
+/* PWA 설치 배너가 표시될 때 컨테이너 하단 여백 */
+.pwa-banner:not(.hidden) {
+    + * .footer,
+    ~ * .footer {
+        margin-bottom: 120px;
+    }
 }
 
 /* PWA 전용 스타일 (설치된 앱에서) */
@@ -957,5 +986,22 @@ body {
     .modal-content {
         padding: 1rem;
         width: 95%;
+    }
+    
+    /* 모바일에서 footer 가독성 개선 */
+    .footer {
+        padding: 1.5rem 0;
+        margin-bottom: 3rem;
+        font-size: 0.85rem;
+    }
+    
+    .footer p:last-child {
+        font-size: 0.8rem;
+        margin-top: 8px;
+    }
+    
+    /* PWA 배너가 있을 때 모바일 footer 여백 */
+    body:has(.pwa-banner:not(.hidden)) .footer {
+        margin-bottom: 140px; /* 모바일에서 더 큰 여백 */
     }
 }
