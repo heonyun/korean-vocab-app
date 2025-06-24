@@ -136,6 +136,16 @@ async function generateVocabulary() {
         
         if (data.success && data.data) {
             currentVocabularyData = data.data;
+            
+            // 맞춤법 검증 결과 확인 및 알림
+            if (data.data.spelling_check && data.data.spelling_check.has_spelling_error) {
+                showSpellingNotification(
+                    data.data.spelling_check.original_word,
+                    data.data.spelling_check.corrected_word,
+                    data.data.spelling_check.correction_note
+                );
+            }
+            
             displayVocabularyResult(data.data);
             showResult();
             showNotification(SUCCESS_MESSAGES.VOCABULARY_GENERATED, 'success');
@@ -602,3 +612,141 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// 맞춤법 오류 알림 함수
+function showSpellingNotification(originalWord, correctedWord, correctionNote) {
+    const notification = document.createElement('div');
+    notification.className = 'spelling-notification';
+    
+    let noteText = correctionNote ? `<br><small>${correctionNote}</small>` : '';
+    
+    notification.innerHTML = `
+        <div class="spelling-notification-content">
+            <div class="spelling-icon">✏️</div>
+            <div class="spelling-text">
+                <strong>맞춤법 수정</strong><br>
+                '<span class="original-word">${originalWord}</span>' → '<span class="corrected-word">${correctedWord}</span>'
+                ${noteText}
+            </div>
+            <button class="spelling-close-btn" onclick="closeSpellingNotification(this)">&times;</button>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // 애니메이션 시작
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+    
+    // 10초 후 자동 제거
+    setTimeout(() => {
+        closeSpellingNotification(notification.querySelector('.spelling-close-btn'));
+    }, 10000);
+}
+
+// 맞춤법 알림 닫기
+function closeSpellingNotification(button) {
+    const notification = button.closest('.spelling-notification');
+    if (notification) {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }
+}
+
+// 맞춤법 알림 스타일 추가
+const spellingStyle = document.createElement('style');
+spellingStyle.textContent = `
+    .spelling-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #ff9800, #f57c00);
+        color: white;
+        padding: 0;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(255, 152, 0, 0.4);
+        z-index: 1001;
+        min-width: 300px;
+        max-width: 400px;
+        transform: translateX(100%);
+        opacity: 0;
+        transition: all 0.3s ease;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .spelling-notification.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    
+    .spelling-notification-content {
+        display: flex;
+        align-items: flex-start;
+        padding: 16px;
+        gap: 12px;
+    }
+    
+    .spelling-icon {
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+    
+    .spelling-text {
+        flex: 1;
+        line-height: 1.4;
+    }
+    
+    .original-word {
+        color: #ffcdd2;
+        text-decoration: line-through;
+    }
+    
+    .corrected-word {
+        color: #c8e6c9;
+        font-weight: bold;
+    }
+    
+    .spelling-close-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.7;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+    
+    .spelling-close-btn:hover {
+        opacity: 1;
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+    }
+    
+    .spelling-notification small {
+        opacity: 0.8;
+        font-size: 12px;
+    }
+    
+    @media (max-width: 480px) {
+        .spelling-notification {
+            right: 10px;
+            left: 10px;
+            min-width: auto;
+            max-width: none;
+        }
+    }
+`;
+document.head.appendChild(spellingStyle);
