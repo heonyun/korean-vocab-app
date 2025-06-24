@@ -13,20 +13,24 @@
 - 🔊 **음성 재생**: 브라우저 TTS를 활용한 한국어 발음 듣기  
 - 💾 **개인 노트**: 학습한 어휘 자동 저장 및 관리
 - 💕 **연인 맞춤**: 연인 관계에서 사용할 수 있는 실용적 예문 제공
-- 📱 **모바일 지원**: 스마트폰에서도 완벽하게 작동하는 반응형 디자인
+- 📱 **PWA 지원**: 홈화면에 설치 가능한 Progressive Web App
+- 🌙 **다크모드**: 사용자 선호에 따른 테마 전환
+- 📴 **오프라인 모드**: 네트워크 없이도 저장된 어휘 확인 가능
+- 🌐 **브라우저 호환성**: Chrome, Firefox, Safari, Samsung Internet 완벽 지원
 
 ## 🛠️ 기술 스택
 
 - **Backend**: FastAPI + PydanticAI
 - **AI**: Google Gemini 2.5 Flash
 - **Frontend**: HTML/CSS/JavaScript (바닐라)
+- **PWA**: Service Worker + Web App Manifest
 - **저장소**: JSON 파일 (로컬 저장)
-- **배포**: Render (무료)
+- **배포**: Render (무료 호스팅)
 
 ## 🚀 빠른 시작
 
 ### 온라인에서 바로 사용 (권장)
-🌐 **[여기를 클릭해서 바로 사용하세요!](배포_후_업데이트_예정)**
+🌐 **[여기를 클릭해서 바로 사용하세요!](https://korean-vocab-app.onrender.com)**
 
 ### 로컬 설치 및 실행
 
@@ -113,10 +117,14 @@ korean-vocab-app/
 │   └── storage.py       # JSON 파일 저장소
 ├── static/
 │   ├── style.css        # 웹 스타일
-│   └── script.js        # 프론트엔드 JavaScript
+│   ├── script.js        # 프론트엔드 JavaScript
+│   ├── manifest.json    # PWA 매니페스트
+│   ├── sw.js           # Service Worker
+│   └── icons/          # PWA 아이콘들
 ├── templates/
 │   └── index.html       # 메인 페이지 템플릿
 ├── requirements.txt     # Python 패키지 의존성
+├── render.yaml         # Render 배포 설정
 ├── run.py              # 실행 스크립트
 └── vocabulary_data.json # 어휘 데이터 저장 파일 (자동 생성)
 ```
@@ -157,11 +165,28 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 - vocabulary_data.json 파일은 중요한 학습 데이터이므로 백업 권장
 - AI 생성 결과는 참고용이며, 완벽하지 않을 수 있습니다
 
+## 🗺️ 향후 로드맵
+
+### 단기 계획 (1-2개월)
+- 🎤 **음성 인식**: 한국어 발음 연습 기능
+- 📊 **학습 통계**: 일일/주간/월간 학습 진도 추적
+- 🔍 **검색 기능**: 저장된 어휘 빠른 검색
+
+### 중기 계획 (3-6개월)
+- 🧠 **스마트 복습**: 망각 곡선 기반 어휘 복습 알림
+- 🎮 **퀴즈 모드**: 학습한 어휘 테스트 게임
+- 🌍 **다국어 확장**: 중국어, 일본어 지원
+
+### 장기 계획 (6개월+)
+- 👥 **사용자 계정**: 클라우드 동기화 및 멀티 디바이스 지원
+- 🤖 **학습 AI**: 개인 맞춤형 학습 추천
+- 📱 **모바일 앱**: React Native 기반 네이티브 앱
+
 ## 🤝 기여하기
 
 1. 버그 리포트 및 기능 제안 환영
 2. 코드 개선 PR 환영
-3. 새로운 언어 지원 (중국어, 일본어 등) 확장 가능
+3. 새로운 언어 지원 확장 기여 가능
 
 ## 📄 라이선스
 
