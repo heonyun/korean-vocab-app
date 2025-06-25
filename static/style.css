@@ -782,11 +782,14 @@ body {
     line-height: 1.4;
 }
 
-.footer p:last-child {
-    color: var(--text-muted);
-    font-style: italic;
-    margin-top: 10px;
-    opacity: 0.8;
+.footer p:last-child,
+.emma-credit {
+    color: var(--text-muted) !important;
+    font-style: italic !important;
+    margin-top: 10px !important;
+    opacity: 0.9 !important;
+    font-weight: 500 !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
 }
 
 /* PWA 설치 배너 */
@@ -995,9 +998,12 @@ body:has(.pwa-banner:not(.hidden)) .footer {
         font-size: 0.85rem;
     }
     
-    .footer p:last-child {
-        font-size: 0.8rem;
-        margin-top: 8px;
+    .footer p:last-child,
+    .emma-credit {
+        font-size: 0.8rem !important;
+        margin-top: 8px !important;
+        color: var(--text-muted) !important;
+        opacity: 1 !important;
     }
     
     /* PWA 배너가 있을 때 모바일 footer 여백 */
