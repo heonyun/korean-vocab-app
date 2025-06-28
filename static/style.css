@@ -792,6 +792,95 @@ body {
     text-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
 }
 
+.version-info {
+    color: var(--text-muted) !important;
+    font-size: 0.75rem !important;
+    margin-top: 5px !important;
+    opacity: 0.8 !important;
+    font-weight: 400 !important;
+}
+
+/* 업데이트 알림 배너 */
+.update-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    padding: 1rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    z-index: 10001;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+}
+
+.update-banner.show {
+    transform: translateY(0);
+}
+
+.update-banner-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.update-banner-text h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.update-banner-text p {
+    margin: 0;
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.update-banner-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.update-btn, .update-dismiss-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.update-btn {
+    background: white;
+    color: #4CAF50;
+}
+
+.update-btn:hover {
+    background: #f0f0f0;
+    transform: translateY(-1px);
+}
+
+.update-dismiss-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.update-dismiss-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* 업데이트 배너가 표시될 때 컨테이너 상단 여백 */
+body:has(.update-banner.show) .container {
+    margin-top: 80px;
+}
+
 /* PWA 설치 배너 */
 .pwa-banner {
     position: fixed;
@@ -1011,5 +1100,25 @@ body:has(.pwa-banner:not(.hidden)) .footer {
     /* PWA 배너가 있을 때 모바일 footer 여백 */
     body:has(.pwa-banner:not(.hidden)) .footer {
         margin-bottom: 140px; /* 모바일에서 더 큰 여백 */
+    }
+    
+    /* 모바일에서 업데이트 배너 */
+    .update-banner-content {
+        flex-direction: column;
+        gap: 0.75rem;
+        text-align: center;
+    }
+    
+    .update-banner-actions {
+        gap: 0.75rem;
+    }
+    
+    .update-btn, .update-dismiss-btn {
+        min-width: 80px;
+    }
+    
+    /* 업데이트 배너가 표시될 때 모바일 컨테이너 상단 여백 */
+    body:has(.update-banner.show) .container {
+        margin-top: 100px;
     }
 }

@@ -27,6 +27,7 @@
         "context": "전화 통화 시"
       }
     ],
+    "spelling_check": null,
     "created_at": "2025-06-22 20:21:37.036027"
   },
   {
@@ -57,6 +58,7 @@
         "context": "전화 통화할 때"
       }
     ],
+    "spelling_check": null,
     "created_at": "2025-06-22 20:22:55.024061"
   },
   {
@@ -87,6 +89,79 @@
         "context": "직접 만났을때"
       }
     ],
+    "spelling_check": null,
     "created_at": "2025-06-22 21:16:06.175485"
+  },
+  {
+    "id": "95bac13f-e55e-4b1c-8346-5bec771b6f9e",
+    "original_word": "안뇽",
+    "russian_translation": "Привет (неформальное)",
+    "pronunciation": "[an-nyeong]",
+    "usage_examples": [
+      {
+        "korean_sentence": "안뇽, 자기야!",
+        "russian_translation": "Приветик, любимый!",
+        "grammar_note": "기본형. 애칭처럼 사용",
+        "grammar_note_russian": "Основная форма. Используется как прозвище.",
+        "context": "메시지"
+      },
+      {
+        "korean_sentence": "오빠, 안뇽~",
+        "russian_translation": "Оппа, приветик~",
+        "grammar_note": "반말, 현재 시제. 귀여움을 표현",
+        "grammar_note_russian": "Неформальный стиль, настоящее время. Выражает милоту.",
+        "context": "대면 대화, 애교스럽게"
+      },
+      {
+        "korean_sentence": "응, 안뇽!",
+        "russian_translation": "Да, привет!",
+        "grammar_note": "인사말, 반말",
+        "grammar_note_russian": "Приветствие, неформальный стиль",
+        "context": "전화"
+      }
+    ],
+    "spelling_check": {
+      "original_word": "안뇽",
+      "corrected_word": "안녕",
+      "has_spelling_error": true,
+      "correction_note": "일반적인 인사말은 '안녕'입니다."
+    },
+    "created_at": "2025-06-28 18:48:36.243760"
+  },
+  {
+    "id": "efcd2612-eae5-4c7e-8297-7294420b0697",
+    "original_word": "안녕",
+    "russian_translation": "Привет",
+    "pronunciation": "[an-nyeong]",
+    "usage_examples": [
+      {
+        "korean_sentence": "안녕, 잘 지냈어?",
+        "russian_translation": "Привет, как дела?",
+        "grammar_note": "기본형. 가벼운 인사",
+        "grammar_note_russian": "Базовая форма. Легкое приветствие",
+        "context": "전화"
+      },
+      {
+        "korean_sentence": "안녕! 뭐해?",
+        "russian_translation": "Привет! Что делаешь?",
+        "grammar_note": "반말. 친근한 인사",
+        "grammar_note_russian": "Неформальное приветствие",
+        "context": "메시지"
+      },
+      {
+        "korean_sentence": "안녕하세요, 오늘 날씨 좋네요.",
+        "russian_translation": "Здравствуйте, сегодня хорошая погода.",
+        "grammar_note": "높임말. 정중한 인사",
+        "grammar_note_russian": "Вежливое приветствие",
+        "context": "대면 대화"
+      }
+    ],
+    "spelling_check": {
+      "original_word": "안녕",
+      "corrected_word": "안녕",
+      "has_spelling_error": false,
+      "correction_note": null
+    },
+    "created_at": "2025-06-28 18:48:52.665629"
   }
 ]

@@ -1,8 +1,9 @@
 // Service Worker for Korean Vocabulary Learning App
 // Samsung Internet 호환성 개선
-const CACHE_NAME = 'korean-vocab-v1.0.1';
-const STATIC_CACHE = 'static-v1.0.1';
-const DYNAMIC_CACHE = 'dynamic-v1.0.1';
+const APP_VERSION = '0.1.5';
+const CACHE_NAME = `korean-vocab-v${APP_VERSION}`;
+const STATIC_CACHE = `static-v${APP_VERSION}`;
+const DYNAMIC_CACHE = `dynamic-v${APP_VERSION}`;
 
 // 캐시할 정적 리소스 목록
 const STATIC_ASSETS = [

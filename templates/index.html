@@ -136,6 +136,7 @@
         <footer class="footer">
             <p>AI 기반 한국어 학습 도구 | PydanticAI + Gemini</p>
             <p class="emma-credit">For Emma, my eternal Muse</p>
+            <p class="version-info">v0.1.5</p>
         </footer>
     </div>
 
@@ -174,6 +175,20 @@
             <span class="close-btn" onclick="closeModal()">&times;</span>
             <div id="modal-body">
                 <!-- 모달 내용이 여기에 동적으로 추가됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 업데이트 알림 배너 -->
+    <div id="update-banner" class="update-banner hidden">
+        <div class="update-banner-content">
+            <div class="update-banner-text">
+                <h3>🚀 새 버전 업데이트</h3>
+                <p>더 나은 기능과 성능 개선이 포함되어 있습니다!</p>
+            </div>
+            <div class="update-banner-actions">
+                <button id="update-btn" class="update-btn">업데이트</button>
+                <button id="update-dismiss-btn" class="update-dismiss-btn">나중에</button>
             </div>
         </div>
     </div>
@@ -267,8 +282,40 @@
 
         // 업데이트 알림
         function showUpdateNotification() {
-            if (confirm('새 버전이 사용 가능합니다. 업데이트하시겠습니까?')) {
-                window.location.reload();
+            console.log('🚀 새 버전 감지됨!');
+            showUpdateBanner();
+        }
+
+        // 업데이트 배너 표시
+        function showUpdateBanner() {
+            const banner = document.getElementById('update-banner');
+            if (banner) {
+                banner.classList.add('show');
+                
+                const updateBtn = document.getElementById('update-btn');
+                const dismissBtn = document.getElementById('update-dismiss-btn');
+                
+                updateBtn.addEventListener('click', () => {
+                    console.log('📥 업데이트 적용 중...');
+                    showNotification('업데이트를 적용하는 중입니다...', 'info');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                });
+                
+                dismissBtn.addEventListener('click', () => {
+                    hideUpdateBanner();
+                    // 10분 후 다시 알림
+                    setTimeout(showUpdateBanner, 10 * 60 * 1000);
+                });
+            }
+        }
+
+        // 업데이트 배너 숨기기
+        function hideUpdateBanner() {
+            const banner = document.getElementById('update-banner');
+            if (banner) {
+                banner.classList.remove('show');
             }
         }
 
