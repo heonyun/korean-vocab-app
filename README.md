@@ -21,7 +21,7 @@
 ## 🛠️ 기술 스택
 
 - **Backend**: FastAPI + PydanticAI
-- **AI**: Google Gemini 2.5 Flash
+- **AI**: Google Gemini 2.0 Flash Experimental
 - **Frontend**: HTML/CSS/JavaScript (바닐라)
 - **PWA**: Service Worker + Web App Manifest
 - **저장소**: JSON 파일 (로컬 저장)

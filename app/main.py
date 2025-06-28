@@ -88,13 +88,13 @@ async def generate_vocabulary(request: VocabularyRequest):
         
         logger.info(f"어휘 생성 요청: {korean_word}")
         
-        # 이미 저장된 단어인지 확인
+        # 1차: 원본 단어로 기존 저장된 어휘 확인
         existing_entry = storage.get_by_word(korean_word)
         if existing_entry:
-            logger.info(f"기존 어휘 반환: {korean_word}")
+            logger.info(f"기존 어휘 반환 (원본): {korean_word}")
             return VocabularyResponse(success=True, data=existing_entry)
         
-        # PydanticAI로 어휘 생성 시도
+        # 2차: AI 어휘 생성 및 맞춤법 교정
         try:
             vocabulary_entry = await generate_vocabulary_entry(korean_word)
             logger.info(f"PydanticAI로 어휘 생성 성공: {korean_word}")
@@ -102,9 +102,17 @@ async def generate_vocabulary(request: VocabularyRequest):
             logger.warning(f"PydanticAI 실패, 백업 함수 사용: {e}")
             vocabulary_entry = await generate_vocabulary_fallback(korean_word)
         
-        # 생성된 어휘 저장
+        # 3차: 교정된 단어로 기존 어휘 재확인 (API 효율성 개선)
+        corrected_word = vocabulary_entry.spelling_check.corrected_word
+        if corrected_word and corrected_word != korean_word:
+            existing_corrected = storage.get_by_word(corrected_word)
+            if existing_corrected:
+                logger.info(f"기존 어휘 반환 (교정됨): {korean_word} -> {corrected_word}")
+                return VocabularyResponse(success=True, data=existing_corrected)
+        
+        # 4차: 새로운 어휘 저장 (교정된 단어 기준)
         saved_entry = storage.save(vocabulary_entry)
-        logger.info(f"어휘 저장 완료: {korean_word}")
+        logger.info(f"어휘 저장 완료: {korean_word} -> {corrected_word or korean_word}")
         
         return VocabularyResponse(success=True, data=saved_entry)
         
