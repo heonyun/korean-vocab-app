@@ -9,6 +9,7 @@
 
 ## 🌟 주요 기능
 
+### 🌐 웹 애플리케이션
 - 🤖 **AI 어휘 생성**: 한국어 단어 입력 → Google Gemini가 자동으로 러시아어 번역 + 발음 + 3개 활용 예제 생성
 - 🔊 **음성 재생**: 브라우저 TTS를 활용한 한국어 발음 듣기  
 - 💾 **개인 노트**: 학습한 어휘 자동 저장 및 관리
@@ -18,6 +19,13 @@
 - 📴 **오프라인 모드**: 네트워크 없이도 저장된 어휘 확인 가능
 - 🌐 **브라우저 호환성**: Chrome, Firefox, Safari, Samsung Internet 완벽 지원
 
+### 🤖 텔레그램 봇 (NEW!)
+- 📱 **@Korean_vocab_helper_bot**: 텔레그램에서 바로 사용 가능한 한국어 학습 봇
+- 💬 **실시간 번역**: 메시지로 한국어 단어 전송 → 즉시 러시아어 번역 + 예문 3개 
+- ✏️ **맞춤법 교정**: 틀린 철자 자동 교정 후 올바른 단어로 학습
+- 📊 **학습 추적**: 개인별 학습 진도 및 어휘 카운트 관리
+- 🎯 **명령어 지원**: `/start`, `/help`, `/about` 등 친화적 인터페이스
+
 ## 🛠️ 기술 스택
 
 - **Backend**: FastAPI + PydanticAI
@@ -26,13 +34,19 @@
 - **PWA**: Service Worker + Web App Manifest
 - **저장소**: JSON 파일 (로컬 저장)
 - **배포**: Render (무료 호스팅)
+- **텔레그램 봇**: python-telegram-bot 22.1 (Polling 방식)
 
 ## 🚀 빠른 시작
 
-### 온라인에서 바로 사용 (권장)
+### 🌐 웹 애플리케이션 (권장)
 🌐 **[여기를 클릭해서 바로 사용하세요!](https://korean-vocab-app.onrender.com)**
 
-### 로컬 설치 및 실행
+### 🤖 텔레그램 봇 (즉시 사용)
+📱 텔레그램에서 **[@Korean_vocab_helper_bot](https://t.me/Korean_vocab_helper_bot)** 검색 후 `/start` 명령어 입력
+
+> **사용법**: 한국어 단어를 메시지로 보내면 즉시 러시아어 번역 + 예문을 받을 수 있습니다!
+
+### 💻 로컬 설치 및 실행
 
 #### 1. 저장소 복제
 ```bash
@@ -56,17 +70,25 @@ pip install -r requirements.txt
 # .env 파일 생성
 cp .env.example .env
 
-# .env 파일에 Google API 키 입력
+# .env 파일에 API 키 입력
 GOOGLE_API_KEY=your_google_api_key_here
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here  # 텔레그램 봇 실행시에만 필요
 ```
 
 #### 5. 앱 실행
+
+##### 웹 애플리케이션 실행:
 ```bash
 python run.py
 ```
+브라우저에서 http://localhost:8000 접속
 
-#### 6. 브라우저 접속
-http://localhost:8000
+##### 텔레그램 봇 실행 (선택사항):
+```bash
+# 별도 터미널에서 실행
+python run_telegram_bot.py
+```
+텔레그램에서 봇과 대화 가능
 
 ## 📱 사용법
 
