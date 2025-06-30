@@ -23,7 +23,7 @@ vocabulary_agent = None
 if GOOGLE_API_KEY:
     try:
         vocabulary_agent = Agent(
-            'gemini-2.5-flash-exp',
+            'gemini-2.0-flash-exp',
             result_type=VocabularyEntry,
             system_prompt="""당신은 러시아인이 한국어를 배우는 것을 도와주는 전문 언어 교사입니다.
 
@@ -108,7 +108,7 @@ async def generate_vocabulary_fallback(korean_word: str) -> VocabularyEntry:
         return create_basic_entry(korean_word, "Google API 키가 설정되지 않음")
         
     try:
-        model = genai.GenerativeModel('gemini-2.5-flash-exp')
+        model = genai.GenerativeModel('gemini-2.0-flash-exp')
         
         prompt = f"""
         한국어 단어 "{korean_word}"에 대해 맞춤법 검증을 포함하여 JSON 형식으로 응답해주세요:
