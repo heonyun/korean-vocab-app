@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="한국어 어휘 학습 노트",
     description="러시아인을 위한 한국어 어휘 학습 도구",
-    version="1.0.0"
+    version="0.1.6"
 )
 
 # 정적 파일 및 템플릿 설정
@@ -103,7 +103,7 @@ async def generate_vocabulary(request: VocabularyRequest):
             vocabulary_entry = await generate_vocabulary_fallback(korean_word)
         
         # 3차: 교정된 단어로 기존 어휘 재확인 (API 효율성 개선)
-        corrected_word = vocabulary_entry.spelling_check.corrected_word
+        corrected_word = vocabulary_entry.spelling_check.corrected_word if vocabulary_entry.spelling_check else None
         if corrected_word and corrected_word != korean_word:
             existing_corrected = storage.get_by_word(corrected_word)
             if existing_corrected:
