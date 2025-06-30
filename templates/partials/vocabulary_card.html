@@ -33,10 +33,16 @@
         <div class="space-y-4">
             {% for example in vocabulary.usage_examples %}
             <div class="example-item bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                <div class="korean-example text-gray-900 dark:text-white font-medium">
-                    {{ example.korean_sentence }}
+                <div class="korean-example flex justify-between items-start">
+                    <div class="text-gray-900 dark:text-white font-medium flex-1">
+                        {{ example.korean_sentence }}
+                    </div>
+                    <button onclick="playKoreanText('{{ example.korean_sentence }}')" 
+                            class="ml-3 bg-green-500 hover:bg-green-600 text-white p-1 rounded transition-all duration-200 hover:scale-105 flex-shrink-0" 
+                            aria-label="{{ example.korean_sentence }} 발음 듣기"
+                            title="예문 발음 듣기">🔊</button>
                 </div>
-                <div class="russian-example text-gray-600 dark:text-gray-300 mt-1">
+                <div class="russian-example text-gray-600 dark:text-gray-300 mt-2">
                     {{ example.russian_translation }}
                 </div>
                 {% if example.grammar_note %}
