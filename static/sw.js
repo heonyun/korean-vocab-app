@@ -1,6 +1,6 @@
 // Service Worker for Korean Vocabulary Learning App
-// Samsung Internet 호환성 개선
-const APP_VERSION = '0.1.5';
+// HTMX + PWA 호환성 개선
+const APP_VERSION = '0.2.0';
 const CACHE_NAME = `korean-vocab-v${APP_VERSION}`;
 const STATIC_CACHE = `static-v${APP_VERSION}`;
 const DYNAMIC_CACHE = `dynamic-v${APP_VERSION}`;
@@ -13,13 +13,19 @@ const STATIC_ASSETS = [
   '/static/manifest.json',
   '/static/icons/icon-192.png',
   '/static/icons/icon-512.png',
+  // HTMX 부분 템플릿 캐싱
+  '/htmx/vocabulary-list',
   // Samsung Internet 호환성을 위한 필수 아이콘 추가
 ];
 
-// 캐시할 API 엔드포인트 패턴
+// 캐시할 API 엔드포인트 패턴 (HTMX 포함)
 const API_PATTERNS = [
   /\/api\/vocabulary/,
-  /\/api\/generate-vocabulary/
+  /\/api\/generate-vocabulary/,
+  /\/htmx\/vocabulary-list/,
+  /\/htmx\/generate-vocabulary/,
+  /\/htmx\/save-vocabulary/,
+  /\/htmx\/validate-input/
 ];
 
 // 설치 이벤트 - 정적 리소스 캐싱

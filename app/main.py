@@ -244,6 +244,48 @@ async def delete_vocabulary_htmx(word: str):
             '<div class="error-message text-red-500 p-2">삭제 중 오류가 발생했습니다.</div>'
         )
 
+@app.post("/htmx/validate-input", response_class=HTMLResponse)
+async def validate_input_htmx(request: Request, value: str = Form(...)):
+    """HTMX를 위한 실시간 입력 검증"""
+    try:
+        value = value.strip()
+        
+        # 빈 입력
+        if not value:
+            return HTMLResponse("")
+        
+        # 길이 검증
+        if len(value) < 1:
+            return templates.TemplateResponse(
+                "partials/validation_message.html",
+                {"request": request, "message": "최소 1글자 이상 입력해주세요.", "type": "warning"}
+            )
+        
+        if len(value) > 50:
+            return templates.TemplateResponse(
+                "partials/validation_message.html",
+                {"request": request, "message": "최대 50글자까지 입력 가능합니다.", "type": "error"}
+            )
+        
+        # 한국어 문자 검증
+        import re
+        korean_pattern = re.compile(r'^[가-힣0-9\s.,!?~\-()]+$')
+        if not korean_pattern.match(value):
+            return templates.TemplateResponse(
+                "partials/validation_message.html",
+                {"request": request, "message": "한국어 문자만 입력 가능합니다.", "type": "error"}
+            )
+        
+        # 유효한 입력
+        return templates.TemplateResponse(
+            "partials/validation_message.html",
+            {"request": request, "message": f"✓ '{value}' 입력이 유효합니다!", "type": "success"}
+        )
+        
+    except Exception as e:
+        logger.error(f"입력 검증 오류: {str(e)}")
+        return HTMLResponse("")
+
 @app.get("/api/vocabulary", response_model=List[VocabularyEntry])
 async def get_all_vocabulary():
     """저장된 모든 어휘 목록 반환"""

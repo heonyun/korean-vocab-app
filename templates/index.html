@@ -84,7 +84,13 @@
                             aria-label="한국어 단어 입력"
                             maxlength="50"
                             required
-                            class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                            pattern="[가-힣0-9\s.,!?~\-()]+"
+                            title="한국어 문자만 입력 가능합니다"
+                            hx-post="/htmx/validate-input"
+                            hx-trigger="input changed delay:500ms"
+                            hx-target="#input-validation"
+                            hx-vals='js:{"value": document.getElementById("korean-word-input").value}'
+                            class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
                         >
                         <button 
                             type="submit"
@@ -95,6 +101,9 @@
                             🔍 생성하기
                         </button>
                     </div>
+                    
+                    <!-- 실시간 입력 검증 결과 -->
+                    <div id="input-validation" class="text-sm"></div>
                 </form>
                 <div id="loading" class="htmx-indicator">
                     <div class="flex items-center justify-center space-x-2 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
@@ -156,26 +165,15 @@
                     </div>
                 </div>
                 
-                <div id="vocabulary-list-container" class="vocabulary-items space-y-3">
-                    {% if vocabulary_list %}
-                        {% for vocab in vocabulary_list %}
-                        <div class="vocabulary-item" data-word="{{ vocab.original_word }}">
-                            <div class="item-header">
-                                <span class="korean-word">{{ vocab.original_word }}</span>
-                                <span class="russian-word">{{ vocab.russian_translation }}</span>
-                            </div>
-                            <div class="item-actions">
-                                <button onclick="showVocabularyDetail('{{ vocab.original_word }}')" class="detail-btn">상세보기</button>
-                                <button onclick="deleteVocabulary('{{ vocab.original_word }}')" class="delete-btn">삭제</button>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state">
-                            <p>아직 저장된 어휘가 없습니다.</p>
-                            <p>위에서 한국어 단어를 입력해보세요!</p>
-                        </div>
-                    {% endif %}
+                <div id="vocabulary-list-container" 
+                     class="vocabulary-items space-y-3"
+                     hx-get="/htmx/vocabulary-list"
+                     hx-trigger="load">
+                    <!-- 초기 로딩 또는 HTMX로 대체될 내용 -->
+                    <div class="flex items-center justify-center p-8">
+                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                        <span class="ml-2 text-gray-600 dark:text-gray-400">목록을 불러오는 중...</span>
+                    </div>
                 </div>
             </section>
         </main>
@@ -391,10 +389,18 @@
                 return currentTheme;
             }
             
-            // 테마 설정
+            // 테마 설정 (Tailwind 다크모드 호환)
             function setTheme(theme) {
+                // Tailwind 다크모드 클래스 설정
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                
+                // 기존 호환성을 위한 data-theme 속성 유지
                 document.documentElement.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme); // constants.js 사용시 STORAGE_KEYS.THEME로 대체 가능
+                localStorage.setItem('theme', theme);
                 
                 // 버튼 아이콘 업데이트
                 if (themeToggleBtn) {
@@ -497,6 +503,90 @@
             testAudioBtn?.addEventListener('click', () => {
                 playKoreanText('안녕하세요. 한국어 음성 테스트입니다.');
             });
+        });
+    </script>
+
+    <!-- 음성 기능을 위한 별도 JavaScript -->
+    <script>
+        // 음성 관련 전역 함수들 (HTMX 호환)
+        let speechSynthesis = window.speechSynthesis;
+        let currentPlaybackRate = 0.8;
+
+        // 재생 속도 설정/가져오기
+        function setPlaybackRate(rate) {
+            currentPlaybackRate = rate;
+            localStorage.setItem('tts-playback-rate', rate.toString());
+        }
+
+        function getPlaybackRate() {
+            const saved = localStorage.getItem('tts-playback-rate');
+            return saved ? parseFloat(saved) : 0.8;
+        }
+
+        // 한국어 음성 재생 (HTMX 템플릿에서 호출 가능)
+        function playPronunciation(word) {
+            if (!word) {
+                // HTMX로 생성된 카드에서 단어 추출
+                const wordElement = document.getElementById('original-word');
+                word = wordElement ? wordElement.textContent : '';
+            }
+            
+            if (!word) return;
+            
+            playKoreanText(word);
+        }
+
+        function playKoreanText(text) {
+            if (!speechSynthesis) {
+                console.warn('음성 합성이 지원되지 않는 브라우저입니다.');
+                return;
+            }
+
+            // 기존 음성 중지
+            speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ko-KR';
+            utterance.rate = getPlaybackRate();
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+
+            // 한국어 음성 우선 선택
+            const voices = speechSynthesis.getVoices();
+            const koreanVoice = voices.find(voice => 
+                voice.lang.startsWith('ko') || 
+                voice.name.includes('Korean') ||
+                voice.name.includes('한국')
+            );
+            
+            if (koreanVoice) {
+                utterance.voice = koreanVoice;
+            }
+
+            speechSynthesis.speak(utterance);
+        }
+
+        // 결과 지우기 함수 (기존 JavaScript 함수와 호환)
+        function clearResult() {
+            const resultSection = document.getElementById('vocabulary-result');
+            if (resultSection) {
+                resultSection.innerHTML = '';
+                resultSection.classList.add('hidden');
+            }
+        }
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            currentPlaybackRate = getPlaybackRate();
+        });
+
+        // HTMX 이벤트 리스너 - 새로운 콘텐츠가 로드될 때마다 실행
+        document.body.addEventListener('htmx:afterSwap', (event) => {
+            // 새로 로드된 어휘 카드에서 음성 버튼 활성화
+            const newContent = event.detail.target;
+            if (newContent) {
+                console.log('🔊 HTMX 콘텐츠 로드 완료 - 음성 기능 준비됨');
+            }
         });
     </script>
 
