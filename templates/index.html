@@ -46,6 +46,10 @@
     
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script>
+        // HTMX 디버그 모드 활성화
+        htmx.logAll();
+    </script>
     
     <!-- Custom CSS (기존 스타일 유지) -->
     <link rel="stylesheet" href="/static/style.css">
@@ -72,6 +76,7 @@
                       hx-target="#vocabulary-result"
                       hx-indicator="#loading"
                       hx-trigger="submit"
+                      hx-swap="innerHTML"
                       class="space-y-4">
                     <div class="input-container flex gap-3">
                         <input 
@@ -114,34 +119,8 @@
             </section>
 
             <!-- 생성된 어휘 표시 섹션 -->
-            <section id="vocabulary-result" class="vocabulary-result hidden">
-                <div class="vocabulary-card bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-                    <div class="card-header flex justify-between items-center mb-4">
-                        <h2 id="original-word" class="text-2xl font-bold text-gray-800 dark:text-white">-</h2>
-                        <button onclick="playPronunciation()" class="play-btn bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg transition-all duration-200" tabindex="3" aria-label="발음 듣기">🔊</button>
-                    </div>
-                    
-                    <div class="translation-info">
-                        <div class="russian-translation">
-                            <strong>🇷🇺 러시아어:</strong> <span id="russian-translation">-</span>
-                        </div>
-                        <div class="pronunciation">
-                            <strong>🔊 발음:</strong> <span id="pronunciation">-</span>
-                        </div>
-                    </div>
-
-                    <div class="usage-examples">
-                        <h3>💡 활용 예제</h3>
-                        <div id="examples-container">
-                            <!-- 예제들이 여기에 동적으로 추가됩니다 -->
-                        </div>
-                    </div>
-
-                    <div class="card-actions">
-                        <button onclick="saveVocabulary()" class="save-btn" tabindex="4" aria-label="노트에 저장">💾 노트에 저장</button>
-                        <button onclick="clearResult()" class="clear-btn" tabindex="5" aria-label="결과 지우기">🗑️ 지우기</button>
-                    </div>
-                </div>
+            <section id="vocabulary-result" class="vocabulary-result">
+                <!-- HTMX가 어휘 카드를 여기에 삽입합니다 -->
             </section>
 
             <!-- 저장된 어휘 목록 섹션 -->
