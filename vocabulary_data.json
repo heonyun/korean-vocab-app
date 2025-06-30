@@ -163,5 +163,149 @@
       "correction_note": null
     },
     "created_at": "2025-06-28 18:48:52.665629"
+  },
+  {
+    "id": "a7d9d388-5232-4a6c-b18d-5d0d6b2e8be3",
+    "original_word": "뭐해",
+    "russian_translation": "번역 필요",
+    "pronunciation": "[뭐해]",
+    "usage_examples": [
+      {
+        "korean_sentence": "뭐해를 사용해보세요",
+        "russian_translation": "Попробуйте использовать это слово",
+        "grammar_note": "기본 사용법",
+        "grammar_note_russian": "базовое использование",
+        "context": "일반적인 상황"
+      },
+      {
+        "korean_sentence": "정말 뭐해네요",
+        "russian_translation": "Действительно...",
+        "grammar_note": "감탄 표현",
+        "grammar_note_russian": "восклицательное выражение",
+        "context": "감정 표현시"
+      },
+      {
+        "korean_sentence": "뭐해라고 생각해요",
+        "russian_translation": "Я думаю, что...",
+        "grammar_note": "의견 표현",
+        "grammar_note_russian": "выражение мнения",
+        "context": "의견을 말할 때"
+      }
+    ],
+    "spelling_check": {
+      "original_word": "뭐해",
+      "corrected_word": "뭐해",
+      "has_spelling_error": false,
+      "correction_note": null
+    },
+    "created_at": "2025-06-28 21:35:55.748571"
+  },
+  {
+    "id": "7054c491-130d-4ba5-811e-6c38376e37f8",
+    "original_word": "안녕하세요",
+    "russian_translation": "번역 필요",
+    "pronunciation": "[안녕하세요]",
+    "usage_examples": [
+      {
+        "korean_sentence": "안녕하세요를 사용해보세요",
+        "russian_translation": "Попробуйте использовать это слово",
+        "grammar_note": "기본 사용법",
+        "grammar_note_russian": "базовое использование",
+        "context": "일반적인 상황"
+      },
+      {
+        "korean_sentence": "정말 안녕하세요네요",
+        "russian_translation": "Действительно...",
+        "grammar_note": "감탄 표현",
+        "grammar_note_russian": "восклицательное выражение",
+        "context": "감정 표현시"
+      },
+      {
+        "korean_sentence": "안녕하세요라고 생각해요",
+        "russian_translation": "Я думаю, что...",
+        "grammar_note": "의견 표현",
+        "grammar_note_russian": "выражение мнения",
+        "context": "의견을 말할 때"
+      }
+    ],
+    "spelling_check": {
+      "original_word": "안녕하세요",
+      "corrected_word": "안녕하세요",
+      "has_spelling_error": false,
+      "correction_note": null
+    },
+    "created_at": "2025-06-30 18:56:55.058884"
+  },
+  {
+    "id": "d5f813b6-312f-4652-b1d8-f2598dc24957",
+    "original_word": "사랑",
+    "russian_translation": "любовь",
+    "pronunciation": "[sa-rang]",
+    "usage_examples": [
+      {
+        "korean_sentence": "자기야, 사랑해!",
+        "russian_translation": "Дорогой/Дорогая, я люблю тебя!",
+        "grammar_note": "\"사랑해\"는 연인 사이에서 '사랑하다'(to love)의 반말 형태로 '사랑해'라고 합니다.",
+        "grammar_note_russian": "'사랑해' (саранхэ) - это неофициальная форма глагола '사랑하다' (саранхада - любить), используемая между влюбленными.",
+        "context": "메시지"
+      },
+      {
+        "korean_sentence": "난 정말 너를 사랑해.",
+        "russian_translation": "Я действительно люблю тебя.",
+        "grammar_note": "\"난\"은 '나'(I)와 주격조사 '는'의 축약형입니다. \"정말\"은 '정말로', '진심으로'를 뜻하는 부사로, 사랑의 감정을 강조합니다.",
+        "grammar_note_russian": "'난' (нан) - это сокращение от '나' (я) и падежного окончания '는'. '정말' (чонмаль) - это наречие, означающее 'действительно' или 'искренне', подчеркивающее силу чувства любви.",
+        "context": "대면 대화"
+      },
+      {
+        "korean_sentence": "우리 영원히 사랑하자!",
+        "russian_translation": "Давай любить друг друга вечно!",
+        "grammar_note": "\"-자\"는 제안이나 권유를 나타내는 종결 어미로, '우리 함께 ~하자'라는 의미로 사용됩니다. \"영원히\"는 '영원토록, 언제까지나'를 뜻하는 부사입니다.",
+        "grammar_note_russian": "Окончание '-자' (джа) используется для выражения предложения или приглашения, означая 'давай вместе сделаем ~'. '영원히' (ёнвонхи) - это наречие, означающее 'навечно, навсегда'.",
+        "context": "전화"
+      }
+    ],
+    "spelling_check": {
+      "original_word": "사랑",
+      "corrected_word": "사랑",
+      "has_spelling_error": false,
+      "correction_note": null
+    },
+    "created_at": "2025-06-30 19:02:29.943979"
+  },
+  {
+    "id": "c8cfd13e-0a36-4a73-98e2-95a867fac00c",
+    "original_word": "어떻게 그럴 수 있어?",
+    "russian_translation": "Как ты мог/могла так поступить? / Как такое возможно?",
+    "pronunciation": "[eo-tteo-ke geu-reol su i-sseo?]",
+    "usage_examples": [
+      {
+        "korean_sentence": "자기야, 어떻게 그럴 수 있어? 나 정말 실망했어.",
+        "russian_translation": "Дорогой/Дорогая, как ты мог/могла так поступить? Я так разочарован/разочарована.",
+        "grammar_note": "\"어떻게 그럴 수 있어?\"는 상대방의 행동에 대한 놀라움, 실망, 혹은 비난을 나타낼 때 사용됩니다. 여기서는 상대방에 대한 실망감을 표현하는 데 쓰였습니다. 반말체입니다.",
+        "grammar_note_russian": "\"어떻게 그럴 수 있어?\" используется для выражения удивления, разочарования или упрека по поводу действия другого человека. Здесь выражается разочарование по отношению к партнеру. Это неформальная речь (반말).",
+        "context": "대면 대화, 갈등 상황 (Face-to-face conversation, conflict situation)"
+      },
+      {
+        "korean_sentence": "오빠, 내가 잠시 연락이 안 됐다고 어떻게 다른 약속을 잡을 수 있어?",
+        "russian_translation": "Оппа, как ты мог договориться о другой встрече только потому, что я некоторое время не отвечала на звонки?",
+        "grammar_note": "\"어떻게 ~ㄹ/을 수 있어?\"는 '어떻게 ~할 수 있니?'와 같은 의미로, 상대방의 행동에 대한 의아함이나 불만을 표현할 때 사용됩니다.",
+        "grammar_note_russian": "\"어떻게 ~ㄹ/을 수 있어?\" имеет значение 'Как ты мог(ла) ~ сделать?' и используется для выражения недоумения или недовольства по поводу чьего-либо действия.",
+        "context": "전화 통화, 가벼운 불만 (Phone call, slight complaint)"
+      },
+      {
+        "korean_sentence": "진짜? 나한테 어떻게 그런 비밀을 숨길 수 있었어?",
+        "russian_translation": "Правда? Как ты мог(могла) скрывать от меня такой секрет?",
+        "grammar_note": "과거형 \"숨길 수 있었어?\"는 과거에 일어난 일에 대해 '어떻게 그런 행동을 했냐'는 의미로 놀람이나 배신감을 나타낼 때 사용됩니다.",
+        "grammar_note_russian": "Прошедшее время \"숨길 수 있었어?\" используется для выражения удивления или чувства предательства по поводу действия, произошедшего в прошлом, со значением 'Как ты мог(могла) так поступить?'.",
+        "context": "메시지 또는 직접 대화, 심각한 대화 (Message or direct conversation, serious conversation)"
+      }
+    ],
+    "spelling_check": {
+      "original_word": "어떻게 그럴수있어?",
+      "corrected_word": "어떻게 그럴 수 있어?",
+      "has_spelling_error": true,
+      "correction_note": "의존 명사 '수'는 앞말과 띄어 써야 합니다."
+    },
+    "created_at": "2025-06-30 19:04:55.656175"
   }
 ]

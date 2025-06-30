@@ -24,7 +24,30 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png">
     
-    <!-- CSS -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f4ff',
+                            500: '#667eea',
+                            600: '#5a6fd8',
+                            700: '#4c63d2'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- Custom CSS (기존 스타일 유지) -->
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -36,8 +59,8 @@
                     <p>러시아인을 위한 한국어 어휘 학습 도구</p>
                 </div>
                 <div class="header-actions">
-                    <button id="theme-toggle-btn" class="header-btn" title="다크모드 전환" tabindex="7" aria-label="테마 전환">🌙</button>
-                    <button id="audio-settings-btn" class="header-btn" title="음성 설정" tabindex="8" aria-label="음성 설정 열기">🔧</button>
+                    <button id="theme-toggle-btn" class="header-btn bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg p-2 transition-all duration-200" title="다크모드 전환" tabindex="7" aria-label="테마 전환">🌙</button>
+                    <button id="audio-settings-btn" class="header-btn bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg p-2 transition-all duration-200" title="음성 설정" tabindex="8" aria-label="음성 설정 열기">🔧</button>
                 </div>
             </div>
         </header>
@@ -57,7 +80,7 @@
                     >
                     <button 
                         id="generate-btn" 
-                        class="generate-btn"
+                        class="generate-btn bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                         onclick="generateVocabulary()"
                         tabindex="2"
                         aria-label="어휘 생성하기"
@@ -73,10 +96,10 @@
 
             <!-- 생성된 어휘 표시 섹션 -->
             <section id="vocabulary-result" class="vocabulary-result hidden">
-                <div class="vocabulary-card">
-                    <div class="card-header">
-                        <h2 id="original-word">-</h2>
-                        <button onclick="playPronunciation()" class="play-btn" tabindex="3" aria-label="발음 듣기">🔊</button>
+                <div class="vocabulary-card bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                    <div class="card-header flex justify-between items-center mb-4">
+                        <h2 id="original-word" class="text-2xl font-bold text-gray-800 dark:text-white">-</h2>
+                        <button onclick="playPronunciation()" class="play-btn bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg transition-all duration-200" tabindex="3" aria-label="발음 듣기">🔊</button>
                     </div>
                     
                     <div class="translation-info">
