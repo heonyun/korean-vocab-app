@@ -44,6 +44,11 @@
                     💡 {{ example.grammar_note }}
                 </div>
                 {% endif %}
+                {% if example.grammar_note_russian %}
+                <div class="grammar-note-russian text-sm text-purple-600 dark:text-purple-400 mt-1">
+                    🇷🇺 {{ example.grammar_note_russian }}
+                </div>
+                {% endif %}
             </div>
             {% endfor %}
         </div>

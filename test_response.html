@@ -1,0 +1,110 @@
+<!-- 자동 저장 알림 -->
+<div class="auto-save-notification bg-green-100 border border-green-400 text-green-700 dark:bg-green-900/20 dark:border-green-600 dark:text-green-400 px-4 py-3 rounded-lg mb-4">
+    <div class="flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        </svg>
+        <span class="text-sm font-medium">✅ '고마워'가 자동으로 저장되었습니다!</span>
+    </div>
+</div>
+
+<div class="vocabulary-card bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+    <div class="card-header flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">고마워</h2>
+        <button onclick="playPronunciation('고마워')" 
+                class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg transition-all duration-200 hover:scale-105" 
+                aria-label="발음 듣기"
+                title="고마워 발음 듣기">🔊</button>
+    </div>
+    
+    <div class="translation-info space-y-3 mb-6">
+        <div class="russian-translation">
+            <strong class="text-gray-700 dark:text-gray-300">🇷🇺 러시아어:</strong> 
+            <span class="text-lg font-medium text-gray-900 dark:text-white">Спасибо</span>
+        </div>
+        <div class="pronunciation">
+            <strong class="text-gray-700 dark:text-gray-300">🔊 발음:</strong> 
+            <span class="text-lg text-gray-800 dark:text-gray-200">[go-ma-wo]</span>
+        </div>
+    </div>
+
+    <div class="usage-examples mb-6">
+        <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-white">💡 활용 예제</h3>
+        <div class="space-y-4">
+            
+            <div class="example-item bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <div class="korean-example text-gray-900 dark:text-white font-medium">
+                    자기야, 점심 맛있게 해줘서 고마워!
+                </div>
+                <div class="russian-example text-gray-600 dark:text-gray-300 mt-1">
+                    Дорогой/Дорогая, спасибо, что так вкусно приготовил(а) обед!
+                </div>
+                
+                <div class="grammar-note text-sm text-blue-600 dark:text-blue-400 mt-2">
+                    💡 동사/형용사 + -아/어/여서: 이유나 원인을 나타내는 연결 어미입니다.
+                </div>
+                
+                
+                <div class="grammar-note-russian text-sm text-purple-600 dark:text-purple-400 mt-1">
+                    🇷🇺 Глагол/Прилагательное + -아/어/여서: Соединительное окончание, указывающее на причину или основание.
+                </div>
+                
+            </div>
+            
+            <div class="example-item bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <div class="korean-example text-gray-900 dark:text-white font-medium">
+                    내 옆에 있어줘서 정말 고마워. 네 덕분에 힘이 나.
+                </div>
+                <div class="russian-example text-gray-600 dark:text-gray-300 mt-1">
+                    Спасибо большое, что ты рядом со мной. Благодаря тебе у меня появляются силы.
+                </div>
+                
+                <div class="grammar-note text-sm text-blue-600 dark:text-blue-400 mt-2">
+                    💡 동사 + -아/어/여 주다: 남을 위해 어떤 행동을 해주는 것을 나타냅니다.
+                </div>
+                
+                
+                <div class="grammar-note-russian text-sm text-purple-600 dark:text-purple-400 mt-1">
+                    🇷🇺 Глагол + -아/어/여 주다: Обозначает выполнение действия для кого-либо.
+                </div>
+                
+            </div>
+            
+            <div class="example-item bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <div class="korean-example text-gray-900 dark:text-white font-medium">
+                    어제 데이트 재밌게 해줘서 너무 고마웠어! 다음에도 같이 가자.
+                </div>
+                <div class="russian-example text-gray-600 dark:text-gray-300 mt-1">
+                    Большое спасибо, что вчера свидание было таким веселым! Давай пойдем вместе и в следующий раз.
+                </div>
+                
+                <div class="grammar-note text-sm text-blue-600 dark:text-blue-400 mt-2">
+                    💡 과거형 &#39;고마웠어&#39;: 과거의 감사함을 표현합니다.
+                </div>
+                
+                
+                <div class="grammar-note-russian text-sm text-purple-600 dark:text-purple-400 mt-1">
+                    🇷🇺 Прошедшее время &#39;고마웠어&#39;: Выражает благодарность за действие, произошедшее в прошлом.
+                </div>
+                
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="card-actions flex gap-3">
+        <button hx-get="/htmx/vocabulary-list" 
+                hx-target="#vocabulary-list-container"
+                hx-trigger="click"
+                class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200">
+            📚 목록 새로고침
+        </button>
+        <button onclick="clearResult()" 
+                class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200">
+            🗑️ 지우기
+        </button>
+    </div>
+</div>
+
+<!-- 알림 영역 -->
+<div id="notification" class="mt-4"></div>
