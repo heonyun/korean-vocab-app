@@ -1,0 +1,37 @@
+{% if vocabulary_list %}
+    {% for vocab in vocabulary_list %}
+    <div class="vocabulary-item bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200" 
+         data-word="{{ vocab.original_word }}">
+        <div class="item-header flex justify-between items-center">
+            <div class="vocabulary-words">
+                <span class="korean-word text-lg font-semibold text-gray-800 dark:text-white">{{ vocab.original_word }}</span>
+                <span class="russian-word text-gray-600 dark:text-gray-400 ml-2">{{ vocab.russian_translation }}</span>
+            </div>
+            <div class="item-actions flex gap-2">
+                <button hx-get="/htmx/vocabulary/{{ vocab.original_word }}"
+                        hx-target="#vocabulary-detail-modal"
+                        hx-trigger="click"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-all duration-200">
+                    상세보기
+                </button>
+                <button hx-delete="/htmx/vocabulary/{{ vocab.original_word }}"
+                        hx-target="closest .vocabulary-item"
+                        hx-swap="outerHTML"
+                        hx-confirm="정말로 '{{ vocab.original_word }}'를 삭제하시겠습니까?"
+                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-all duration-200">
+                    삭제
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-state text-center py-8">
+        <div class="text-gray-500 dark:text-gray-400 text-lg mb-2">📖</div>
+        <p class="text-gray-600 dark:text-gray-400 mb-1">아직 저장된 어휘가 없습니다.</p>
+        <p class="text-gray-500 dark:text-gray-500 text-sm">위에서 한국어 단어를 입력해보세요!</p>
+    </div>
+{% endif %}
+
+<!-- 상세보기 모달 영역 -->
+<div id="vocabulary-detail-modal"></div>

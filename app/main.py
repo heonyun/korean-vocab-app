@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
@@ -123,6 +123,125 @@ async def generate_vocabulary(request: VocabularyRequest):
         return VocabularyResponse(
             success=False, 
             error=f"어휘 생성 중 오류가 발생했습니다: {str(e)}"
+        )
+
+# HTMX 전용 엔드포인트들
+@app.post("/htmx/generate-vocabulary", response_class=HTMLResponse)
+async def generate_vocabulary_htmx(request: Request, korean_word: str = Form(...)):
+    """HTMX를 위한 어휘 생성 엔드포인트 - HTML 응답"""
+    try:
+        korean_word = korean_word.strip()
+        
+        if not korean_word:
+            return templates.TemplateResponse(
+                "partials/error.html",
+                {"request": request, "error": "한국어 단어를 입력해주세요"}
+            )
+        
+        logger.info(f"HTMX 어휘 생성 요청: {korean_word}")
+        
+        # 기존 로직과 동일
+        existing_entry = storage.get_by_word(korean_word)
+        if existing_entry:
+            logger.info(f"기존 어휘 반환 (원본): {korean_word}")
+            return templates.TemplateResponse(
+                "partials/vocabulary_card.html",
+                {"request": request, "vocabulary": existing_entry}
+            )
+        
+        # AI 어휘 생성
+        try:
+            vocabulary_entry = await generate_vocabulary_entry(korean_word)
+            logger.info(f"PydanticAI로 어휘 생성 성공: {korean_word}")
+        except Exception as e:
+            logger.warning(f"PydanticAI 실패, 백업 함수 사용: {e}")
+            vocabulary_entry = await generate_vocabulary_fallback(korean_word)
+        
+        # 교정된 단어 재확인
+        corrected_word = vocabulary_entry.spelling_check.corrected_word if vocabulary_entry.spelling_check else None
+        if corrected_word and corrected_word != korean_word:
+            existing_corrected = storage.get_by_word(corrected_word)
+            if existing_corrected:
+                logger.info(f"기존 어휘 반환 (교정됨): {korean_word} -> {corrected_word}")
+                return templates.TemplateResponse(
+                    "partials/vocabulary_card.html",
+                    {"request": request, "vocabulary": existing_corrected}
+                )
+        
+        # 새로운 어휘 저장
+        saved_entry = storage.save(vocabulary_entry)
+        logger.info(f"어휘 저장 완료: {korean_word} -> {corrected_word or korean_word}")
+        
+        return templates.TemplateResponse(
+            "partials/vocabulary_card.html",
+            {"request": request, "vocabulary": saved_entry}
+        )
+        
+    except Exception as e:
+        logger.error(f"HTMX 어휘 생성 오류: {str(e)}")
+        return templates.TemplateResponse(
+            "partials/error.html",
+            {"request": request, "error": f"어휘 생성 중 오류가 발생했습니다: {str(e)}"}
+        )
+
+@app.get("/htmx/vocabulary-list", response_class=HTMLResponse)
+async def get_vocabulary_list_htmx(request: Request):
+    """HTMX를 위한 어휘 목록 엔드포인트 - HTML 응답"""
+    try:
+        vocabulary_list = storage.load_all()
+        vocabulary_list.sort(key=lambda x: x.created_at or "", reverse=True)
+        return templates.TemplateResponse(
+            "partials/vocabulary_list.html",
+            {"request": request, "vocabulary_list": vocabulary_list[-10:]}  # 최근 10개
+        )
+    except Exception as e:
+        logger.error(f"HTMX 어휘 목록 조회 오류: {str(e)}")
+        return templates.TemplateResponse(
+            "partials/error.html",
+            {"request": request, "error": "어휘 목록을 불러올 수 없습니다"}
+        )
+
+@app.post("/htmx/save-vocabulary", response_class=HTMLResponse)
+async def save_vocabulary_htmx(request: Request, word: str = Form(...)):
+    """HTMX를 위한 어휘 저장 엔드포인트"""
+    try:
+        # 어휘가 이미 저장되어 있는지 확인
+        existing_entry = storage.get_by_word(word)
+        if existing_entry:
+            return templates.TemplateResponse(
+                "partials/notification.html",
+                {"request": request, "message": f"'{word}'는 이미 저장되어 있습니다!", "type": "info"}
+            )
+        
+        logger.error(f"저장하려는 어휘를 찾을 수 없습니다: {word}")
+        return templates.TemplateResponse(
+            "partials/notification.html",
+            {"request": request, "message": "저장할 어휘를 찾을 수 없습니다.", "type": "error"}
+        )
+        
+    except Exception as e:
+        logger.error(f"HTMX 어휘 저장 오류: {str(e)}")
+        return templates.TemplateResponse(
+            "partials/notification.html",
+            {"request": request, "message": "저장 중 오류가 발생했습니다.", "type": "error"}
+        )
+
+@app.delete("/htmx/vocabulary/{word}", response_class=HTMLResponse)
+async def delete_vocabulary_htmx(word: str):
+    """HTMX를 위한 어휘 삭제 엔드포인트"""
+    try:
+        success = storage.delete(word)
+        if success:
+            logger.info(f"어휘 삭제 완료: {word}")
+            return HTMLResponse("")  # 빈 응답으로 요소 제거
+        else:
+            return HTMLResponse(
+                '<div class="error-message text-red-500 p-2">삭제할 어휘를 찾을 수 없습니다.</div>'
+            )
+    except Exception as e:
+        logger.error(f"HTMX 어휘 삭제 오류: {str(e)}")
+        return HTMLResponse(
+            '<div class="error-message text-red-500 p-2">삭제 중 오류가 발생했습니다.</div>'
         )
 
 @app.get("/api/vocabulary", response_model=List[VocabularyEntry])

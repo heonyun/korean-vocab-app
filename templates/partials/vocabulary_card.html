@@ -1,0 +1,52 @@
+<div class="vocabulary-card bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+    <div class="card-header flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">{{ vocabulary.original_word }}</h2>
+        <button onclick="playPronunciation('{{ vocabulary.original_word }}')" 
+                class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg transition-all duration-200" 
+                aria-label="발음 듣기">🔊</button>
+    </div>
+    
+    <div class="translation-info space-y-3 mb-6">
+        <div class="russian-translation">
+            <strong class="text-gray-700 dark:text-gray-300">🇷🇺 러시아어:</strong> 
+            <span class="text-lg font-medium text-gray-900 dark:text-white">{{ vocabulary.russian_translation }}</span>
+        </div>
+        <div class="pronunciation">
+            <strong class="text-gray-700 dark:text-gray-300">🔊 발음:</strong> 
+            <span class="text-lg text-gray-800 dark:text-gray-200">{{ vocabulary.pronunciation }}</span>
+        </div>
+    </div>
+
+    <div class="usage-examples mb-6">
+        <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-white">💡 활용 예제</h3>
+        <div class="space-y-4">
+            {% for example in vocabulary.examples %}
+            <div class="example-item bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <div class="korean-example text-gray-900 dark:text-white font-medium">
+                    {{ example.korean }}
+                </div>
+                <div class="russian-example text-gray-600 dark:text-gray-300 mt-1">
+                    {{ example.russian }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card-actions flex gap-3">
+        <button hx-post="/htmx/save-vocabulary" 
+                hx-vals='{"word": "{{ vocabulary.original_word }}"}'
+                hx-trigger="click"
+                hx-target="#notification"
+                class="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200">
+            💾 노트에 저장
+        </button>
+        <button onclick="clearResult()" 
+                class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200">
+            🗑️ 지우기
+        </button>
+    </div>
+</div>
+
+<!-- 알림 영역 -->
+<div id="notification" class="mt-4"></div>

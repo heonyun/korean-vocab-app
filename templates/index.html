@@ -68,29 +68,39 @@
         <main class="main-content">
             <!-- 어휘 입력 섹션 -->
             <section class="input-section">
-                <div class="input-container">
-                    <input 
-                        type="text" 
-                        id="korean-word-input" 
-                        placeholder="한국어 단어를 입력하세요 (예: 사랑해)"
-                        autocomplete="off"
-                        tabindex="1"
-                        aria-label="한국어 단어 입력"
-                        maxlength="50"
-                    >
-                    <button 
-                        id="generate-btn" 
-                        class="generate-btn bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                        onclick="generateVocabulary()"
-                        tabindex="2"
-                        aria-label="어휘 생성하기"
-                    >
-                        🔍 생성하기
-                    </button>
-                </div>
-                <div id="loading" class="loading hidden">
-                    <div class="spinner"></div>
-                    AI가 어휘를 생성 중입니다...
+                <form hx-post="/htmx/generate-vocabulary"
+                      hx-target="#vocabulary-result"
+                      hx-indicator="#loading"
+                      hx-trigger="submit"
+                      class="space-y-4">
+                    <div class="input-container flex gap-3">
+                        <input 
+                            type="text" 
+                            name="korean_word"
+                            id="korean-word-input" 
+                            placeholder="한국어 단어를 입력하세요 (예: 사랑해)"
+                            autocomplete="off"
+                            tabindex="1"
+                            aria-label="한국어 단어 입력"
+                            maxlength="50"
+                            required
+                            class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                        >
+                        <button 
+                            type="submit"
+                            class="generate-btn bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50"
+                            tabindex="2"
+                            aria-label="어휘 생성하기"
+                        >
+                            🔍 생성하기
+                        </button>
+                    </div>
+                </form>
+                <div id="loading" class="htmx-indicator">
+                    <div class="flex items-center justify-center space-x-2 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-500"></div>
+                        <span class="text-blue-700 dark:text-blue-300 font-medium">🤖 AI가 어휘를 생성 중입니다...</span>
+                    </div>
                 </div>
             </section>
 
@@ -127,12 +137,26 @@
 
             <!-- 저장된 어휘 목록 섹션 -->
             <section class="vocabulary-list">
-                <div class="list-header">
-                    <h3>📚 저장된 어휘 ({{ vocabulary_count }}개)</h3>
-                    <button onclick="refreshVocabularyList()" class="refresh-btn" tabindex="6" aria-label="어휘 목록 새로고침">🔄 새로고침</button>
+                <div class="list-header flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">📚 저장된 어휘 ({{ vocabulary_count }}개)</h3>
+                    <button hx-get="/htmx/vocabulary-list" 
+                            hx-target="#vocabulary-list-container"
+                            hx-indicator="#list-loading"
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                            tabindex="6" 
+                            aria-label="어휘 목록 새로고침">
+                        🔄 새로고침
+                    </button>
                 </div>
                 
-                <div id="vocabulary-list-container" class="vocabulary-items">
+                <div id="list-loading" class="htmx-indicator">
+                    <div class="flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                        <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+                        <span class="ml-2 text-gray-600 dark:text-gray-400 font-medium">📚 목록을 불러오는 중...</span>
+                    </div>
+                </div>
+                
+                <div id="vocabulary-list-container" class="vocabulary-items space-y-3">
                     {% if vocabulary_list %}
                         {% for vocab in vocabulary_list %}
                         <div class="vocabulary-item" data-word="{{ vocab.original_word }}">
