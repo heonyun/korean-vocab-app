@@ -1,0 +1,706 @@
+/* 터미널 CSS - Korean Learning Terminal */
+
+/* 기본 리셋 및 설정 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* 터미널 색상 팔레트 */
+    --terminal-bg: #000000;
+    --terminal-text: #00ff00;
+    --terminal-border: #333333;
+    --terminal-header-bg: #2d2d2d;
+    --terminal-prompt: #ffff00;
+    --terminal-user: #00ffff;
+    --terminal-error: #ff4444;
+    --terminal-success: #44ff44;
+    --terminal-warning: #ffaa00;
+    --terminal-info: #4488ff;
+    
+    /* 폰트 설정 */
+    --terminal-font: 'Courier New', 'Monaco', 'Menlo', 'Consolas', monospace;
+    --terminal-font-size: 14px;
+    --terminal-line-height: 1.4;
+    
+    /* 애니메이션 설정 */
+    --typing-speed: 50ms;
+    --cursor-blink: 1s;
+    
+    /* 크기 설정 */
+    --terminal-border-radius: 8px;
+    --header-height: 40px;
+    --status-height: 30px;
+    --input-height: 40px;
+}
+
+/* 메인 컨테이너 */
+body {
+    font-family: var(--terminal-font);
+    background: #1a1a1a;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.terminal-container {
+    width: 100%;
+    max-width: 1200px;
+    height: calc(100vh - 40px);
+    margin: 0 auto;
+    background: var(--terminal-bg);
+    border: 2px solid var(--terminal-border);
+    border-radius: var(--terminal-border-radius);
+    box-shadow: 0 10px 30px rgba(0, 255, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* 터미널 헤더 */
+.terminal-header {
+    height: var(--header-height);
+    background: var(--terminal-header-bg);
+    border-bottom: 1px solid var(--terminal-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    user-select: none;
+}
+
+/* 트래픽 라이트 (맥OS 스타일) */
+.traffic-lights {
+    display: flex;
+    gap: 8px;
+}
+
+.traffic-light {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.traffic-light.red {
+    background: #ff5f56;
+}
+
+.traffic-light.yellow {
+    background: #ffbd2e;
+}
+
+.traffic-light.green {
+    background: #27ca3f;
+}
+
+/* 터미널 타이틀 */
+.terminal-title {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    flex: 1;
+    padding: 0 20px;
+}
+
+/* 터미널 컨트롤 */
+.terminal-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.control-btn {
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* 터미널 메인 영역 */
+.terminal-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* 터미널 출력 영역 */
+.terminal-output {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    font-size: var(--terminal-font-size);
+    line-height: var(--terminal-line-height);
+    color: var(--terminal-text);
+}
+
+/* 스크롤바 스타일링 */
+.terminal-output::-webkit-scrollbar {
+    width: 12px;
+}
+
+.terminal-output::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.terminal-output::-webkit-scrollbar-thumb {
+    background: #333333;
+    border-radius: 6px;
+}
+
+.terminal-output::-webkit-scrollbar-thumb:hover {
+    background: #555555;
+}
+
+/* 환영 메시지 */
+.welcome-message {
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--terminal-border);
+    padding-bottom: 20px;
+}
+
+.ascii-art {
+    font-size: 10px;
+    color: var(--terminal-success);
+    margin-bottom: 15px;
+    text-align: center;
+    white-space: pre;
+    font-family: monospace;
+}
+
+.welcome-text p {
+    margin-bottom: 8px;
+    color: var(--terminal-info);
+}
+
+#current-mode {
+    color: var(--terminal-warning);
+    font-weight: bold;
+}
+
+/* 메시지 스타일 */
+.message {
+    margin-bottom: 15px;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.message-user {
+    text-align: right;
+}
+
+.message-ai {
+    text-align: left;
+}
+
+.message-system {
+    text-align: center;
+    color: var(--terminal-warning);
+    font-style: italic;
+}
+
+.message-error {
+    color: var(--terminal-error);
+    background: rgba(255, 68, 68, 0.1);
+    padding: 10px;
+    border-left: 3px solid var(--terminal-error);
+    margin: 10px 0;
+}
+
+.message-content {
+    display: inline-block;
+    padding: 12px 16px;
+    border-radius: 8px;
+    max-width: 80%;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.message-user .message-content {
+    background: rgba(0, 136, 255, 0.2);
+    color: #4db8ff;
+    margin-left: auto;
+}
+
+.message-ai .message-content {
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    color: var(--terminal-text);
+}
+
+.message-timestamp {
+    font-size: 11px;
+    color: #666666;
+    margin-top: 5px;
+}
+
+/* 터미널 입력 영역 */
+.terminal-input-container {
+    border-top: 1px solid var(--terminal-border);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    min-height: var(--input-height);
+}
+
+.terminal-prompt {
+    color: var(--terminal-user);
+    font-size: var(--terminal-font-size);
+    white-space: nowrap;
+    user-select: none;
+}
+
+.prompt-user {
+    color: var(--terminal-success);
+}
+
+.prompt-separator {
+    color: #ffffff;
+}
+
+.prompt-path {
+    color: var(--terminal-info);
+}
+
+.prompt-symbol {
+    color: var(--terminal-prompt);
+    margin-left: 5px;
+}
+
+.terminal-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--terminal-text);
+    font-family: var(--terminal-font);
+    font-size: var(--terminal-font-size);
+    padding: 8px 0;
+    caret-color: var(--terminal-text);
+}
+
+.terminal-input::placeholder {
+    color: #666666;
+}
+
+/* 로딩 인디케이터 */
+.loading-indicator {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+}
+
+.loading-indicator.hidden {
+    display: none;
+}
+
+.loading-dot {
+    color: var(--terminal-warning);
+    font-size: 20px;
+    animation: loadingPulse 1.5s infinite;
+}
+
+.loading-dot:nth-child(2) {
+    animation-delay: 0.5s;
+}
+
+.loading-dot:nth-child(3) {
+    animation-delay: 1s;
+}
+
+/* 상태바 */
+.terminal-status {
+    height: var(--status-height);
+    background: var(--terminal-header-bg);
+    border-top: 1px solid var(--terminal-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    font-size: 11px;
+}
+
+.status-left, .status-right {
+    display: flex;
+    gap: 15px;
+}
+
+.status-item {
+    color: #cccccc;
+}
+
+#connection-status.connected {
+    color: var(--terminal-success);
+}
+
+#connection-status.disconnected {
+    color: var(--terminal-error);
+}
+
+#connection-status.connecting {
+    color: var(--terminal-warning);
+}
+
+/* 모달 스타일 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: var(--terminal-bg);
+    border: 2px solid var(--terminal-border);
+    border-radius: var(--terminal-border-radius);
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    color: var(--terminal-text);
+    text-align: center;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--terminal-text);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.btn-reconnect, .btn-primary, .btn-secondary {
+    background: var(--terminal-success);
+    color: var(--terminal-bg);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: var(--terminal-font);
+    margin: 10px 5px;
+    transition: opacity 0.2s;
+}
+
+.btn-secondary {
+    background: var(--terminal-border);
+    color: var(--terminal-text);
+}
+
+.btn-reconnect:hover, .btn-primary:hover, .btn-secondary:hover {
+    opacity: 0.8;
+}
+
+/* 재연결 진행 표시 */
+.reconnect-progress {
+    margin: 20px 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #333;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--terminal-success);
+    width: 0%;
+    transition: width 0.3s;
+}
+
+/* 설정 모달 */
+.settings-content {
+    text-align: left;
+}
+
+.setting-group {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.setting-group label {
+    color: var(--terminal-text);
+    margin-right: 10px;
+}
+
+.setting-group select, .setting-group input {
+    background: var(--terminal-bg);
+    border: 1px solid var(--terminal-border);
+    color: var(--terminal-text);
+    padding: 5px;
+    border-radius: 3px;
+}
+
+/* 키보드 단축키 도움말 */
+.help-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.help-overlay.hidden {
+    display: none;
+}
+
+.help-content {
+    background: var(--terminal-bg);
+    border: 2px solid var(--terminal-success);
+    border-radius: var(--terminal-border-radius);
+    padding: 30px;
+    max-width: 600px;
+    width: 90%;
+    color: var(--terminal-text);
+}
+
+.shortcuts-list {
+    margin: 20px 0;
+}
+
+.shortcut {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #333;
+}
+
+.shortcut:last-child {
+    border-bottom: none;
+}
+
+kbd {
+    background: #333;
+    border: 1px solid #666;
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-family: var(--terminal-font);
+}
+
+.help-footer {
+    text-align: center;
+    margin-top: 20px;
+    color: #888;
+    font-size: 12px;
+}
+
+/* 타이핑 애니메이션 */
+.typing-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: var(--terminal-text);
+    animation: cursorBlink var(--cursor-blink) infinite;
+    margin-left: 2px;
+}
+
+/* 애니메이션 정의 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes loadingPulse {
+    0%, 60%, 100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    30% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+@keyframes cursorBlink {
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .terminal-container {
+        height: calc(100vh - 20px);
+        border-radius: 0;
+    }
+    
+    .terminal-title {
+        font-size: 11px;
+        padding: 0 10px;
+    }
+    
+    .terminal-output {
+        padding: 15px;
+        font-size: 13px;
+    }
+    
+    .ascii-art {
+        font-size: 8px;
+    }
+    
+    .message-content {
+        max-width: 95%;
+        padding: 10px 12px;
+    }
+    
+    .terminal-input-container {
+        padding: 8px 15px;
+    }
+    
+    .modal-content {
+        padding: 20px;
+        margin: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .traffic-lights {
+        display: none;
+    }
+    
+    .terminal-controls {
+        display: none;
+    }
+    
+    .terminal-title {
+        text-align: left;
+        padding: 0;
+    }
+    
+    .terminal-output {
+        padding: 10px;
+        font-size: 12px;
+    }
+    
+    .status-left, .status-right {
+        gap: 10px;
+    }
+    
+    .status-item {
+        font-size: 10px;
+    }
+    
+    .ascii-art {
+        display: none;
+    }
+}
+
+/* 전체화면 모드 */
+.terminal-container.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    border-radius: 0;
+    z-index: 999;
+}
+
+/* 테마 변형 (향후 확장용) */
+.terminal-container.theme-blue {
+    --terminal-text: #00aaff;
+    --terminal-success: #0088ff;
+}
+
+.terminal-container.theme-amber {
+    --terminal-text: #ffaa00;
+    --terminal-success: #ff8800;
+}
+
+.terminal-container.theme-white {
+    --terminal-bg: #ffffff;
+    --terminal-text: #333333;
+    --terminal-border: #cccccc;
+    --terminal-header-bg: #f0f0f0;
+}
+
+/* 접근성 개선 */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* 고대비 모드 */
+@media (prefers-contrast: high) {
+    :root {
+        --terminal-text: #ffffff;
+        --terminal-bg: #000000;
+        --terminal-border: #ffffff;
+    }
+}

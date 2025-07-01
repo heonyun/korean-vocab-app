@@ -1,14 +1,21 @@
-from fastapi import FastAPI, HTTPException, Request, Form
+from fastapi import FastAPI, HTTPException, Request, Form, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 from typing import List
 import logging
 import os
+import json
 
 from .models import VocabularyRequest, VocabularyResponse, VocabularyEntry
 from .ai_service import generate_vocabulary_entry, generate_vocabulary_fallback
 from .storage import storage
+from .terminal_service import (
+    parse_terminal_command, 
+    process_terminal_translation,
+    format_terminal_response,
+    TranslationMode
+)
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
@@ -330,6 +337,192 @@ async def delete_vocabulary(word: str):
 async def health_check():
     """서버 상태 확인"""
     return {"status": "healthy", "message": "한국어 어휘 학습 노트 서버 정상 동작중"}
+
+# 터미널 인터페이스 관련 라우트들
+@app.get("/terminal", response_class=HTMLResponse)
+async def terminal_interface(request: Request):
+    """터미널 인터페이스 페이지"""
+    return templates.TemplateResponse(
+        "terminal.html",
+        {"request": request}
+    )
+
+# WebSocket 세션 관리
+class TerminalSession:
+    def __init__(self):
+        self.mode = TranslationMode.AUTO
+        self.translation_count = 0
+        self.command_count = 0
+    
+    def update_stats(self, message_type: str):
+        if message_type == "translation":
+            self.translation_count += 1
+        elif message_type == "command":
+            self.command_count += 1
+
+@app.websocket("/ws/terminal")
+async def websocket_terminal_endpoint(websocket: WebSocket):
+    """터미널 WebSocket 엔드포인트"""
+    await websocket.accept()
+    session = TerminalSession()
+    
+    # 연결 환영 메시지
+    welcome_message = {
+        "type": "connection",
+        "status": "connected",
+        "message": "터미널에 연결되었습니다. /help를 입력하여 사용법을 확인하세요.",
+        "mode": session.mode.value
+    }
+    await websocket.send_text(json.dumps(welcome_message, ensure_ascii=False))
+    
+    try:
+        while True:
+            # 메시지 수신
+            try:
+                data = await websocket.receive_text()
+                message = json.loads(data)
+            except json.JSONDecodeError:
+                error_response = {
+                    "type": "error",
+                    "message": "잘못된 JSON 형식입니다."
+                }
+                await websocket.send_text(json.dumps(error_response, ensure_ascii=False))
+                continue
+            except Exception as e:
+                error_response = {
+                    "type": "error", 
+                    "message": f"메시지 수신 오류: {str(e)}"
+                }
+                await websocket.send_text(json.dumps(error_response, ensure_ascii=False))
+                continue
+            
+            # 필수 필드 확인
+            if "type" not in message:
+                error_response = {
+                    "type": "error",
+                    "message": "'type' 필드가 필요합니다."
+                }
+                await websocket.send_text(json.dumps(error_response, ensure_ascii=False))
+                continue
+            
+            message_type = message.get("type")
+            text = message.get("text", "")
+            
+            # 메시지 타입별 처리
+            if message_type == "translate":
+                # 번역 요청 처리
+                if not text.strip():
+                    response = {
+                        "type": "translation",
+                        "success": False,
+                        "error": "빈 텍스트는 번역할 수 없습니다."
+                    }
+                else:
+                    # 모드 설정
+                    request_mode = message.get("mode", "auto")
+                    if request_mode == "session":
+                        mode = session.mode
+                    else:
+                        mode = TranslationMode(request_mode) if request_mode in ["auto", "korean", "russian"] else session.mode
+                    
+                    # 번역 처리
+                    translation_result = await process_terminal_translation(text, mode)
+                    
+                    if translation_result["success"]:
+                        formatted_response = format_terminal_response(
+                            translation_result, 
+                            typing_animation=True
+                        )
+                        response = {
+                            "type": "translation",
+                            "success": True,
+                            "data": formatted_response,
+                            "original": translation_result.get("original"),
+                            "translation": translation_result.get("translation")
+                        }
+                        session.update_stats("translation")
+                    else:
+                        response = {
+                            "type": "translation", 
+                            "success": False,
+                            "error": translation_result.get("error", "번역 실패")
+                        }
+                
+                await websocket.send_text(json.dumps(response, ensure_ascii=False))
+            
+            elif message_type == "command":
+                # 명령어 처리
+                command_result = parse_terminal_command(text)
+                
+                if command_result is None:
+                    response = {
+                        "type": "command_result",
+                        "success": False,
+                        "error": "명령어가 아닙니다. '/'로 시작해야 합니다."
+                    }
+                elif command_result["type"] == "invalid":
+                    response = {
+                        "type": "command_result",
+                        "success": False,
+                        "error": command_result["error"]
+                    }
+                else:
+                    # 유효한 명령어 처리
+                    if command_result["type"] == "help":
+                        formatted_response = format_terminal_response(None, command_type="help")
+                    elif command_result["type"] == "clear":
+                        formatted_response = format_terminal_response(None, command_type="clear")
+                    elif command_result["type"] == "mode":
+                        new_mode = command_result["mode"]
+                        session.mode = TranslationMode(new_mode)
+                        formatted_response = format_terminal_response(
+                            None, 
+                            command_type="mode_change", 
+                            mode=new_mode
+                        )
+                    
+                    response = {
+                        "type": "command_result",
+                        "success": True,
+                        "data": formatted_response,
+                        "command_type": command_result["type"]
+                    }
+                    session.update_stats("command")
+                
+                await websocket.send_text(json.dumps(response, ensure_ascii=False))
+            
+            elif message_type == "get_stats":
+                # 통계 정보 (향후 구현)
+                response = {
+                    "type": "stats",
+                    "data": {
+                        "translation_count": session.translation_count,
+                        "command_count": session.command_count,
+                        "current_mode": session.mode.value
+                    }
+                }
+                await websocket.send_text(json.dumps(response, ensure_ascii=False))
+            
+            else:
+                # 지원되지 않는 메시지 타입
+                response = {
+                    "type": "error",
+                    "message": f"지원되지 않는 메시지 타입: {message_type}"
+                }
+                await websocket.send_text(json.dumps(response, ensure_ascii=False))
+    
+    except WebSocketDisconnect:
+        logger.info("터미널 WebSocket 연결이 종료되었습니다")
+    except Exception as e:
+        logger.error(f"터미널 WebSocket 오류: {str(e)}")
+        error_response = {
+            "type": "error",
+            "message": f"서버 오류: {str(e)}"
+        }
+        try:
+            await websocket.send_text(json.dumps(error_response, ensure_ascii=False))
+        except:
+            pass
 
 if __name__ == "__main__":
     import uvicorn
