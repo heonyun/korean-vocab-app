@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Korean Chat - 한국어 메신저 학습</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Korean Chat">
+    
+    <!-- Icons -->
+    <link rel="apple-touch-icon" sizes="152x152" href="/static/icons/icon-152.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f4ff',
+                            500: '#667eea',
+                            600: '#5a6fd8',
+                            700: '#4c63d2'
+                        },
+                        chat: {
+                            bg: '#f7fafc',
+                            'bg-dark': '#1a202c',
+                            user: '#667eea',
+                            ai: '#e2e8f0',
+                            'ai-dark': '#2d3748'
+                        }
+                    },
+                    maxWidth: {
+                        'chat': '768px'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- Custom CSS for Chat -->
+    <style>
+        /* 메신저 스타일 커스텀 CSS */
+        .chat-container {
+            height: 100vh;
+            height: 100dvh; /* 모바일 브라우저 주소창 고려 */
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        
+        .message-bubble {
+            max-width: 85%;
+            word-wrap: break-word;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .message-user {
+            margin-left: auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .message-ai {
+            margin-right: auto;
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+        
+        .dark .message-ai {
+            background: #2d3748;
+            color: #e2e8f0;
+        }
+        
+        .message-system {
+            margin: 0 auto;
+            background: #fed7d7;
+            color: #c53030;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+        
+        .dark .message-system {
+            background: #742a2a;
+            color: #fed7d7;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .typing-indicator {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        /* 햄버거 메뉴 애니메이션 */
+        .hamburger-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .hamburger-menu.open {
+            transform: translateX(0);
+        }
+        
+        /* 스크롤바 커스텀 */
+        .chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 2px;
+        }
+        
+        .dark .chat-messages::-webkit-scrollbar-thumb {
+            background: #4a5568;
+        }
+        
+        /* 모바일 터치 최적화 */
+        @media (max-width: 768px) {
+            .message-bubble {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body class="bg-chat-bg dark:bg-chat-bg-dark text-gray-900 dark:text-gray-100">
+    <!-- 햄버거 메뉴 오버레이 -->
+    <div id="menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+    
+    <!-- 햄버거 메뉴 -->
+    <div id="hamburger-menu" class="hamburger-menu fixed left-0 top-0 h-full w-80 max-w-sm bg-white dark:bg-gray-800 shadow-xl z-50">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-white">Korean Chat</h2>
+                <button id="close-menu" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- 메뉴 항목들 -->
+            <nav class="space-y-3">
+                <button id="new-chat-btn" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <span class="text-xl">💬</span>
+                    <span>새 대화 시작</span>
+                </button>
+                
+                <div class="border-t border-gray-200 dark:border-gray-600 my-4"></div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">대화 기록</h3>
+                    <div id="session-list" class="space-y-2 max-h-64 overflow-y-auto">
+                        <!-- 세션 목록이 여기에 로드됩니다 -->
+                        <div class="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
+                            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-500 mx-auto mb-2"></div>
+                            로딩 중...
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border-t border-gray-200 dark:border-gray-600 my-4"></div>
+                
+                <button id="toggle-theme" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <span class="text-xl">🌙</span>
+                    <span>다크모드</span>
+                </button>
+                
+                <button id="bookmarks-btn" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <span class="text-xl">🦊</span>
+                    <span>북마크 보기</span>
+                    <span id="bookmark-count" class="ml-auto text-xs bg-primary-500 text-white px-2 py-1 rounded-full">0</span>
+                </button>
+                
+                <button id="review-btn" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <span class="text-xl">📚</span>
+                    <span>복습하기</span>
+                    <span id="review-count" class="ml-auto text-xs bg-orange-500 text-white px-2 py-1 rounded-full">0</span>
+                </button>
+                
+                <button id="voice-settings" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <span class="text-xl">🔊</span>
+                    <span>음성 설정</span>
+                </button>
+                
+                <button id="clear-current-chat" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-red-600 dark:text-red-400">
+                    <span class="text-xl">🗑️</span>
+                    <span>현재 대화 지우기</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+    
+    <!-- 메인 채팅 컨테이너 -->
+    <div class="chat-container max-w-chat mx-auto bg-white dark:bg-gray-900 shadow-lg">
+        <!-- 헤더 -->
+        <header class="bg-primary-500 text-white p-4 flex items-center justify-between shadow-md">
+            <div class="flex items-center space-x-3">
+                <button id="menu-toggle" class="p-2 rounded-lg hover:bg-white/20 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                <div>
+                    <h1 class="font-bold text-lg">Korean Chat</h1>
+                    <p class="text-sm text-blue-100" id="session-info">한국어 학습을 시작해보세요!</p>
+                </div>
+            </div>
+            <button id="settings-btn" class="p-2 rounded-lg hover:bg-white/20 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+            </button>
+        </header>
+        
+        <!-- 메시지 영역 -->
+        <div id="chat-messages" class="chat-messages p-4 space-y-4">
+            <!-- 환영 메시지 -->
+            <div class="message-bubble message-system rounded-lg p-3 mx-8 text-center">
+                <div class="font-medium mb-2">👋 안녕하세요! 한국어 ↔ 러시아어 번역을 도와드릴게요!</div>
+                <div class="text-xs text-gray-600 dark:text-gray-400 mb-2">💡 팁: /로 상황을 설명할 수 있어요!</div>
+                <div class="text-xs italic text-purple-600 dark:text-purple-400 mb-1">For Emma, my eternal Muse</div>
+                <div class="text-xs text-gray-500 dark:text-gray-500">v0.1.5</div>
+            </div>
+        </div>
+        
+        <!-- 타이핑 인디케이터 -->
+        <div id="typing-indicator" class="hidden p-4">
+            <div class="message-bubble message-ai rounded-lg p-3 typing-indicator">
+                <div class="flex space-x-1">
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 입력 영역 -->
+        <div class="p-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+            <form id="chat-form" class="flex space-x-3">
+                <input 
+                    type="text" 
+                    id="message-input"
+                    placeholder="궁금한 표현을 입력하세요..."
+                    class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                    maxlength="200"
+                    autocomplete="off"
+                >
+                <button 
+                    type="submit"
+                    id="send-btn"
+                    class="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-full font-medium shadow-md hover:shadow-lg transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 복습 모달 -->
+    <div id="review-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-hidden">
+                <!-- 모달 헤더 -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-600">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        📚 복습하기
+                    </h3>
+                    <button id="close-review-modal" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- 모달 콘텐츠 -->
+                <div id="review-content" class="p-4 overflow-y-auto max-h-[70vh]">
+                    <!-- 복습 카드가 여기에 표시됩니다 -->
+                </div>
+                
+                <!-- 모달 푸터 -->
+                <div id="review-footer" class="p-4 border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+                    <div class="flex justify-between items-center">
+                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                            <span id="review-progress">0 / 0</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button id="prev-review" class="px-3 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 disabled:opacity-50" disabled>
+                                이전
+                            </button>
+                            <button id="next-review" class="px-3 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50" disabled>
+                                다음
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 북마크 목록 모달 -->
+    <div id="bookmarks-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+                <!-- 모달 헤더 -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-600">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        🦊 북마크 목록
+                    </h3>
+                    <button id="close-bookmarks-modal" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- 모달 콘텐츠 -->
+                <div id="bookmarks-content" class="p-4 overflow-y-auto max-h-[70vh]">
+                    <div id="bookmarks-loading" class="text-center py-8">
+                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+                        <p class="mt-2 text-gray-600 dark:text-gray-400">북마크를 불러오는 중...</p>
+                    </div>
+                    <div id="bookmarks-list" class="space-y-4 hidden">
+                        <!-- 북마크 목록이 여기에 표시됩니다 -->
+                    </div>
+                    <div id="bookmarks-empty" class="text-center py-8 hidden">
+                        <div class="text-gray-400 text-6xl mb-4">🦊</div>
+                        <p class="text-gray-600 dark:text-gray-400">저장된 북마크가 없습니다.</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-500 mt-2">AI 응답에서 🤍 버튼을 눌러 북마크를 추가해보세요.</p>
+                    </div>
+                </div>
+                
+                <!-- 모달 푸터 -->
+                <div class="p-4 border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+                    <div class="flex justify-between items-center">
+                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                            <span id="bookmarks-count">총 0개의 북마크</span>
+                        </div>
+                        <button id="clear-all-bookmarks" class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm">
+                            전체 삭제
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script>
+        // 전역 변수
+        let currentSessionId = null;
+        let isLoading = false;
+        
+        // DOM 요소들
+        const menuToggle = document.getElementById('menu-toggle');
+        const hamburgerMenu = document.getElementById('hamburger-menu');
+        const menuOverlay = document.getElementById('menu-overlay');
+        const closeMenu = document.getElementById('close-menu');
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const chatForm = document.getElementById('chat-form');
+        const sendBtn = document.getElementById('send-btn');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const sessionInfo = document.getElementById('session-info');
+        
+        // 햄버거 메뉴 토글
+        function toggleMenu() {
+            hamburgerMenu.classList.toggle('open');
+            menuOverlay.classList.toggle('hidden');
+            if (hamburgerMenu.classList.contains('open')) {
+                loadSessionList();
+            }
+        }
+        
+        function closeMenuHandler() {
+            hamburgerMenu.classList.remove('open');
+            menuOverlay.classList.add('hidden');
+        }
+        
+        // 이벤트 리스너
+        menuToggle.addEventListener('click', toggleMenu);
+        closeMenu.addEventListener('click', closeMenuHandler);
+        menuOverlay.addEventListener('click', closeMenuHandler);
+        
+        // 메시지 전송
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await sendMessage();
+        });
+        
+        // 엔터키로 전송
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        // 메시지 전송 함수
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message || isLoading) return;
+            
+            isLoading = true;
+            sendBtn.disabled = true;
+            
+            // 사용자 메시지 표시
+            addMessage('user', message);
+            messageInput.value = '';
+            
+            // 타이핑 인디케이터 표시
+            showTypingIndicator();
+            
+            try {
+                const response = await fetch('/api/chat/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        session_id: currentSessionId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentSessionId = data.session_id;
+                    updateSessionInfo();
+                    
+                    // AI 응답 표시
+                    if (data.message) {
+                        addAIMessage(data.message);
+                    }
+                } else {
+                    addMessage('system', `오류: ${data.error}`);
+                }
+            } catch (error) {
+                console.error('메시지 전송 오류:', error);
+                addMessage('system', '네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+            } finally {
+                hideTypingIndicator();
+                isLoading = false;
+                sendBtn.disabled = false;
+                messageInput.focus();
+            }
+        }
+        
+        // 메시지 추가 함수
+        function addMessage(type, text, data = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message-bubble message-${type} rounded-lg p-3 mb-3`;
+            
+            if (type === 'ai' && data) {
+                // AI 응답의 경우 특별한 형태로 표시
+                messageDiv.innerHTML = `
+                    <div class="font-medium text-primary-600 dark:text-primary-400 mb-1 flex items-center gap-2">
+                        ${text}
+                        <button onclick="playTTS('${text.replace(/'/g, "\\'")}')" class="text-lg hover:scale-110 transition-transform" title="발음 듣기">
+                            🔊
+                        </button>
+                        <button onclick="toggleBookmark('${data.id || ''}')" class="text-lg hover:scale-110 transition-transform bookmark-btn" title="북마크 추가" data-message-id="${data.id || ''}">
+                            🤍
+                        </button>
+                    </div>
+                    ${data.pronunciation ? `<div class="text-sm text-gray-600 dark:text-gray-400 mb-2">${data.pronunciation}</div>` : ''}
+                    ${data.usage_examples && data.usage_examples.length > 0 ? `
+                        <div class="mt-2">
+                            <button class="text-xs bg-primary-100 dark:bg-primary-800 text-primary-700 dark:text-primary-300 px-2 py-1 rounded-full" onclick="toggleExamples(this)">
+                                📝 예문 ${data.usage_examples.length}개 숨기기
+                            </button>
+                            <div class="mt-2 space-y-2" data-examples='${JSON.stringify(data.usage_examples)}'>
+                                ${data.usage_examples.map(ex => `
+                                    <div class="text-xs bg-gray-50 dark:bg-gray-700 p-2 rounded">
+                                        <div class="font-medium flex items-center gap-2">
+                                            ${ex.korean_sentence}
+                                            <button onclick="playTTS('${ex.korean_sentence.replace(/'/g, "\\'")}')" class="text-sm hover:scale-110 transition-transform" title="예문 발음 듣기">
+                                                🔊
+                                            </button>
+                                        </div>
+                                        <div class="text-gray-600 dark:text-gray-400">${ex.russian_translation}</div>
+                                        <div class="text-gray-500 dark:text-gray-500 text-xs mt-1">
+                                            <div>${ex.context}</div>
+                                            ${ex.context_russian ? `<div class="italic text-blue-600 dark:text-blue-400">${ex.context_russian}</div>` : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+            } else {
+                messageDiv.textContent = text;
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        // AI 메시지 추가 (특별 처리)
+        function addAIMessage(messageData) {
+            addMessage('ai', messageData.russian_translation || messageData.text, messageData);
+        }
+        
+        // 예문 토글 (기본값: 표시됨)
+        function toggleExamples(button) {
+            const examplesDiv = button.parentElement.querySelector('[data-examples]');
+            if (examplesDiv.classList.contains('hidden')) {
+                examplesDiv.classList.remove('hidden');
+                button.textContent = button.textContent.replace('보기', '숨기기');
+            } else {
+                examplesDiv.classList.add('hidden');
+                button.textContent = button.textContent.replace('숨기기', '보기');
+            }
+        }
+        
+        // 타이핑 인디케이터
+        function showTypingIndicator() {
+            typingIndicator.classList.remove('hidden');
+            scrollToBottom();
+        }
+        
+        function hideTypingIndicator() {
+            typingIndicator.classList.add('hidden');
+        }
+        
+        // 스크롤 하단으로
+        function scrollToBottom() {
+            setTimeout(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 100);
+        }
+        
+        // 세션 정보 업데이트
+        function updateSessionInfo() {
+            if (currentSessionId) {
+                sessionInfo.textContent = `세션: ${currentSessionId.split('-').slice(-1)[0]}`;
+            }
+        }
+        
+        // 세션 목록 로드
+        async function loadSessionList() {
+            const sessionList = document.getElementById('session-list');
+            sessionList.innerHTML = `
+                <div class="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
+                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-500 mx-auto mb-2"></div>
+                    로딩 중...
+                </div>
+            `;
+            
+            try {
+                const response = await fetch('/api/chat/sessions');
+                const data = await response.json();
+                
+                if (data.success && data.sessions.length > 0) {
+                    sessionList.innerHTML = data.sessions.map(session => `
+                        <button 
+                            class="w-full text-left p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            onclick="loadSession('${session.session_id}')"
+                        >
+                            <div class="text-sm font-medium truncate">${session.title}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                ${session.message_count}개 메시지 • ${new Date(session.last_updated).toLocaleDateString()}
+                            </div>
+                        </button>
+                    `).join('');
+                } else {
+                    sessionList.innerHTML = `
+                        <div class="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
+                            저장된 대화가 없습니다
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('세션 목록 로드 오류:', error);
+                sessionList.innerHTML = `
+                    <div class="text-center py-4 text-red-500 text-sm">
+                        로드 실패
+                    </div>
+                `;
+            }
+        }
+        
+        // 세션 로드
+        async function loadSession(sessionId) {
+            try {
+                const response = await fetch(`/api/chat/sessions/${sessionId}`);
+                const session = await response.json();
+                
+                if (session.session_id) {
+                    currentSessionId = session.session_id;
+                    updateSessionInfo();
+                    
+                    // 메시지 영역 클리어
+                    chatMessages.innerHTML = '';
+                    
+                    // 메시지들 표시
+                    session.messages.forEach(msg => {
+                        if (msg.type === 'ai') {
+                            addAIMessage(msg);
+                        } else {
+                            addMessage(msg.type, msg.text);
+                        }
+                    });
+                    
+                    closeMenuHandler();
+                }
+            } catch (error) {
+                console.error('세션 로드 오류:', error);
+            }
+        }
+        
+        // 새 대화 시작
+        document.getElementById('new-chat-btn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/chat/sessions/new', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentSessionId = data.session_id;
+                    updateSessionInfo();
+                    chatMessages.innerHTML = '';
+                    if (data.message) {
+                        addMessage(data.message.type, data.message.text);
+                    }
+                    closeMenuHandler();
+                }
+            } catch (error) {
+                console.error('새 세션 생성 오류:', error);
+            }
+        });
+        
+        // 북마크 버튼 이벤트
+        document.getElementById('bookmarks-btn').addEventListener('click', showBookmarks);
+        
+        // 복습 버튼 이벤트
+        document.getElementById('review-btn').addEventListener('click', startReview);
+        
+        // 복습 모달 이벤트 리스너
+        document.getElementById('close-review-modal').addEventListener('click', closeReviewModal);
+        document.getElementById('prev-review').addEventListener('click', () => navigateReview('prev'));
+        document.getElementById('next-review').addEventListener('click', () => navigateReview('next'));
+        
+        // 복습 모달 배경 클릭시 닫기
+        document.getElementById('review-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'review-modal') {
+                closeReviewModal();
+            }
+        });
+        
+        // 북마크 모달 이벤트 리스너
+        document.getElementById('close-bookmarks-modal').addEventListener('click', closeBookmarksModal);
+        
+        // 북마크 모달 배경 클릭시 닫기
+        document.getElementById('bookmarks-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'bookmarks-modal') {
+                closeBookmarksModal();
+            }
+        });
+        
+        // 다크모드 토글
+        document.getElementById('toggle-theme').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            
+            const button = document.getElementById('toggle-theme');
+            button.querySelector('span').textContent = isDark ? '☀️' : '🌙';
+        });
+        
+        // 초기화
+        // TTS 음성 재생 함수
+        function playTTS(text) {
+            try {
+                // 기존 재생 중지
+                speechSynthesis.cancel();
+                
+                // 새로운 음성 생성
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ko-KR'; // 한국어 설정
+                utterance.rate = 0.8; // 조금 느리게
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                
+                // 한국어 음성 찾기
+                const voices = speechSynthesis.getVoices();
+                const koreanVoice = voices.find(voice => 
+                    voice.lang.includes('ko') || voice.name.includes('Korean')
+                );
+                
+                if (koreanVoice) {
+                    utterance.voice = koreanVoice;
+                }
+                
+                // 음성 재생
+                speechSynthesis.speak(utterance);
+                
+                // 에러 처리
+                utterance.onerror = (event) => {
+                    console.error('TTS 오류:', event.error);
+                };
+                
+            } catch (error) {
+                console.error('TTS 재생 실패:', error);
+                // 사용자에게 알림 (선택사항)
+                // alert('음성 재생이 지원되지 않는 브라우저입니다.');
+            }
+        }
+        
+        // 북마크 관련 함수들
+        async function toggleBookmark(messageId) {
+            if (!messageId || !currentSessionId) {
+                console.error('메시지 ID 또는 세션 ID가 없습니다');
+                return;
+            }
+            
+            try {
+                const button = document.querySelector(`button[data-message-id="${messageId}"]`);
+                if (!button) return;
+                
+                // 현재 북마크 상태 확인
+                const isBookmarked = button.textContent === '🦊';
+                
+                if (isBookmarked) {
+                    // 북마크 제거 (향후 구현)
+                    console.log('북마크 제거 기능은 향후 구현 예정');
+                    return;
+                }
+                
+                // 북마크 추가
+                const response = await fetch('/api/bookmarks/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        message_id: messageId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 북마크 버튼 업데이트
+                    button.textContent = '🦊';
+                    button.title = '북마크됨';
+                    
+                    // 북마크 카운트 업데이트
+                    await updateBookmarkCounts();
+                    
+                    // 성공 알림 (선택사항)
+                    console.log('북마크 추가됨:', data.bookmark.korean_text);
+                } else {
+                    console.error('북마크 추가 실패:', data.error);
+                }
+                
+            } catch (error) {
+                console.error('북마크 토글 오류:', error);
+            }
+        }
+        
+        // 북마크 및 복습 카운트 업데이트
+        async function updateBookmarkCounts() {
+            try {
+                // 북마크 총 개수
+                const bookmarksResponse = await fetch('/api/bookmarks');
+                if (bookmarksResponse.ok) {
+                    const bookmarksData = await bookmarksResponse.json();
+                    const bookmarkCount = document.getElementById('bookmark-count');
+                    if (bookmarkCount) {
+                        bookmarkCount.textContent = bookmarksData.total_count || 0;
+                    }
+                }
+                
+                // 복습 필요 개수
+                const reviewResponse = await fetch('/api/bookmarks/review');
+                if (reviewResponse.ok) {
+                    const reviewData = await reviewResponse.json();
+                    const reviewCount = document.getElementById('review-count');
+                    if (reviewCount) {
+                        reviewCount.textContent = reviewData.total_count || 0;
+                    }
+                }
+                
+            } catch (error) {
+                console.error('카운트 업데이트 오류:', error);
+            }
+        }
+        
+        // 북마크 목록 보기
+        async function showBookmarks() {
+            // 북마크 모달 열기
+            const modal = document.getElementById('bookmarks-modal');
+            const loading = document.getElementById('bookmarks-loading');
+            const list = document.getElementById('bookmarks-list');
+            const empty = document.getElementById('bookmarks-empty');
+            const count = document.getElementById('bookmarks-count');
+            
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            // 로딩 상태 표시
+            loading.classList.remove('hidden');
+            list.classList.add('hidden');
+            empty.classList.add('hidden');
+            
+            try {
+                const response = await fetch('/api/bookmarks');
+                const data = await response.json();
+                
+                loading.classList.add('hidden');
+                
+                if (data.success) {
+                    count.textContent = `총 ${data.total_count}개의 북마크`;
+                    
+                    if (data.bookmarks.length > 0) {
+                        renderBookmarksList(data.bookmarks);
+                        list.classList.remove('hidden');
+                    } else {
+                        empty.classList.remove('hidden');
+                    }
+                } else {
+                    console.error('북마크 목록 로드 실패:', data.error);
+                    empty.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('북마크 목록 로드 오류:', error);
+                loading.classList.add('hidden');
+                empty.classList.remove('hidden');
+            }
+        }
+        
+        function renderBookmarksList(bookmarks) {
+            const list = document.getElementById('bookmarks-list');
+            list.innerHTML = '';
+            
+            bookmarks.forEach(bookmark => {
+                const bookmarkDiv = document.createElement('div');
+                bookmarkDiv.className = 'border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700';
+                
+                const koreanText = bookmark.korean_text;
+                const russianText = bookmark.russian_translation;
+                const pronunciation = bookmark.pronunciation || '';
+                const createdDate = new Date(bookmark.created_at).toLocaleDateString('ko-KR');
+                
+                bookmarkDiv.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-medium text-gray-900 dark:text-white">${koreanText}</span>
+                                <button onclick="playTTS('${koreanText.replace(/'/g, "\\'")}')" class="text-sm hover:scale-110 transition-transform" title="발음 듣기">🔊</button>
+                            </div>
+                            <div class="text-gray-600 dark:text-gray-400 mb-1">${russianText}</div>
+                            ${pronunciation ? `<div class="text-sm text-gray-500 dark:text-gray-500">[${pronunciation}]</div>` : ''}
+                        </div>
+                        <div class="flex items-center gap-2 ml-4">
+                            <span class="text-xs text-gray-400">${createdDate}</span>
+                            <button onclick="deleteBookmark('${bookmark.id}')" class="text-red-500 hover:text-red-700 p-1" title="삭제">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                    
+                    ${bookmark.usage_examples && bookmark.usage_examples.length > 0 ? `
+                        <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-600">
+                            <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">활용 예문:</div>
+                            ${bookmark.usage_examples.slice(0, 2).map(example => `
+                                <div class="text-sm mb-2 p-2 bg-gray-50 dark:bg-gray-600 rounded">
+                                    <div class="text-gray-800 dark:text-gray-200">${example.korean_sentence}</div>
+                                    <div class="text-gray-600 dark:text-gray-400">${example.russian_translation}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                `;
+                
+                list.appendChild(bookmarkDiv);
+            });
+        }
+        
+        function closeBookmarksModal() {
+            const modal = document.getElementById('bookmarks-modal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        
+        async function deleteBookmark(bookmarkId) {
+            if (!confirm('이 북마크를 삭제하시겠습니까?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/bookmarks/${bookmarkId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    // 북마크 목록 새로고침
+                    showBookmarks();
+                    updateBookmarkCounts();
+                } else {
+                    alert('북마크 삭제에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('북마크 삭제 오류:', error);
+                alert('북마크 삭제 중 오류가 발생했습니다.');
+            }
+        }
+        
+        // 복습 관련 전역 변수
+        let reviewBookmarks = [];
+        let currentReviewIndex = 0;
+        let reviewModal = null;
+        
+        // 복습하기
+        async function startReview() {
+            try {
+                const response = await fetch('/api/bookmarks/review');
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (data.bookmarks.length === 0) {
+                        alert('복습할 북마크가 없습니다!');
+                        return;
+                    }
+                    
+                    // 복습 데이터 설정
+                    reviewBookmarks = data.bookmarks;
+                    currentReviewIndex = 0;
+                    
+                    // 복습 모달 열기
+                    openReviewModal();
+                    showCurrentReviewCard();
+                } else {
+                    console.error('복습 목록 로드 실패:', data.error);
+                }
+            } catch (error) {
+                console.error('복습 시작 오류:', error);
+            }
+        }
+        
+        // 복습 모달 열기
+        function openReviewModal() {
+            reviewModal = document.getElementById('review-modal');
+            reviewModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
+        }
+        
+        // 복습 모달 닫기
+        function closeReviewModal() {
+            if (reviewModal) {
+                reviewModal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                reviewBookmarks = [];
+                currentReviewIndex = 0;
+            }
+        }
+        
+        // 현재 복습 카드 표시
+        function showCurrentReviewCard() {
+            if (!reviewBookmarks.length) return;
+            
+            const bookmark = reviewBookmarks[currentReviewIndex];
+            const reviewContent = document.getElementById('review-content');
+            const reviewProgress = document.getElementById('review-progress');
+            
+            // 진도 업데이트
+            reviewProgress.textContent = `${currentReviewIndex + 1} / ${reviewBookmarks.length}`;
+            
+            // 카드 내용 생성
+            reviewContent.innerHTML = `
+                <div class="space-y-4">
+                    <div class="text-center">
+                        <h4 class="text-xl font-bold text-primary-600 dark:text-primary-400 mb-2">
+                            ${bookmark.korean_text}
+                        </h4>
+                        <p class="text-lg text-gray-700 dark:text-gray-300 mb-1">
+                            ${bookmark.russian_translation}
+                        </p>
+                        ${bookmark.pronunciation ? `<p class="text-sm text-gray-500 dark:text-gray-400">${bookmark.pronunciation}</p>` : ''}
+                    </div>
+                    
+                    ${bookmark.usage_examples && bookmark.usage_examples.length > 0 ? `
+                        <div class="border-t border-gray-200 dark:border-gray-600 pt-4">
+                            <h5 class="font-semibold text-gray-800 dark:text-gray-200 mb-3">예문:</h5>
+                            <div class="space-y-3">
+                                ${bookmark.usage_examples.map(ex => `
+                                    <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                                        <div class="font-medium text-gray-900 dark:text-gray-100 mb-1">
+                                            ${ex.korean_sentence}
+                                        </div>
+                                        <div class="text-gray-600 dark:text-gray-400 text-sm">
+                                            ${ex.russian_translation}
+                                        </div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                                            ${ex.context}
+                                            ${ex.context_russian ? `<div class="italic text-blue-600 dark:text-blue-400">${ex.context_russian}</div>` : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="border-t border-gray-200 dark:border-gray-600 pt-4">
+                        <h5 class="font-semibold text-gray-800 dark:text-gray-200 mb-3">이 단어의 난이도는?</h5>
+                        <div class="grid grid-cols-5 gap-2">
+                            ${[1, 2, 3, 4, 5].map(level => `
+                                <button onclick="completeReview(${bookmark.id ? `'${bookmark.id}'` : 'null'}, ${level})" 
+                                        class="p-3 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900 text-center transition-colors">
+                                    <div class="text-lg mb-1">${getDifficultyEmoji(level)}</div>
+                                    <div class="text-xs text-gray-600 dark:text-gray-400">${getDifficultyText(level)}</div>
+                                </button>
+                            `).join('')}
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-500 mt-2 text-center">
+                            난이도에 따라 다음 복습 일정이 결정됩니다
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            // 내비게이션 버튼 상태 업데이트
+            updateReviewNavigation();
+        }
+        
+        // 난이도별 이모티콘
+        function getDifficultyEmoji(level) {
+            const emojis = ['😴', '😊', '🤔', '😅', '😰'];
+            return emojis[level - 1];
+        }
+        
+        // 난이도별 텍스트
+        function getDifficultyText(level) {
+            const texts = ['매우 쉬움', '쉬움', '보통', '어려움', '매우 어려움'];
+            return texts[level - 1];
+        }
+        
+        // 복습 완료 처리
+        async function completeReview(bookmarkId, difficulty) {
+            if (!bookmarkId) {
+                console.error('북마크 ID가 없습니다');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/bookmarks/${bookmarkId}/review`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ difficulty_rating: difficulty })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 다음 카드로 이동
+                    if (currentReviewIndex < reviewBookmarks.length - 1) {
+                        currentReviewIndex++;
+                        showCurrentReviewCard();
+                    } else {
+                        // 복습 완료
+                        alert('모든 복습을 완료했습니다! 🎉');
+                        closeReviewModal();
+                        updateBookmarkCounts(); // 카운트 업데이트
+                    }
+                } else {
+                    console.error('복습 완료 처리 실패:', data.error);
+                    alert('복습 완료 처리 중 오류가 발생했습니다.');
+                }
+                
+            } catch (error) {
+                console.error('복습 완료 처리 오류:', error);
+                alert('복습 완료 처리 중 오류가 발생했습니다.');
+            }
+        }
+        
+        // 복습 내비게이션 업데이트
+        function updateReviewNavigation() {
+            const prevBtn = document.getElementById('prev-review');
+            const nextBtn = document.getElementById('next-review');
+            
+            prevBtn.disabled = currentReviewIndex === 0;
+            nextBtn.disabled = currentReviewIndex === reviewBookmarks.length - 1;
+        }
+        
+        // 이전/다음 복습 카드
+        function navigateReview(direction) {
+            if (direction === 'prev' && currentReviewIndex > 0) {
+                currentReviewIndex--;
+                showCurrentReviewCard();
+            } else if (direction === 'next' && currentReviewIndex < reviewBookmarks.length - 1) {
+                currentReviewIndex++;
+                showCurrentReviewCard();
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // 저장된 테마 로드
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('toggle-theme').querySelector('span').textContent = '☀️';
+            }
+            
+            // TTS 음성 로드 (브라우저 호환성)
+            if ('speechSynthesis' in window) {
+                speechSynthesis.getVoices(); // 음성 목록 로드 트리거
+                
+                // 음성 목록이 비동기로 로드되므로 이벤트 리스너 추가
+                speechSynthesis.addEventListener('voiceschanged', () => {
+                    const voices = speechSynthesis.getVoices();
+                    console.log('사용 가능한 TTS 음성:', voices.filter(v => v.lang.includes('ko')).length + '개');
+                });
+            }
+            
+            // 북마크 카운트 초기 로드
+            updateBookmarkCounts();
+            
+            messageInput.focus();
+        });
+    </script>
+</body>
+</html>

@@ -60,6 +60,8 @@ Thumbs.db
 
 # Project Specific
 vocabulary_data.json  # 개인 어휘 데이터
+bookmarks.json        # 개인 북마크 데이터
+chat_sessions.json    # 개인 채팅 세션 데이터
 *.sqlite
 *.db
 
@@ -70,6 +72,8 @@ vocabulary_data.json  # 개인 어휘 데이터
 # Logs
 logs/
 *.log
+chat_server.log
+server.log
 
 # Runtime data
 pids/

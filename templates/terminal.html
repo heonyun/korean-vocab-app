@@ -4,11 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Korean Learning Terminal | 한국어 학습 터미널</title>
-    <link rel="stylesheet" href="/static/terminal.css">
+    <link rel="stylesheet" href="/static/terminal.css?v=scroll-fix-2">
     <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png">
 </head>
 <body>
+    <!-- 상단 네비게이션 바 -->
+    <div class="nav-header">
+        <div class="nav-left">
+            <button id="hamburgerMenu" class="hamburger-btn" title="메뉴">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            <div class="app-title">Korean Learning Terminal</div>
+        </div>
+        <div class="nav-right">
+            <button id="settingsBtn" class="nav-btn" title="설정">⚙️</button>
+            <button id="helpBtn" class="nav-btn" title="도움말">❓</button>
+        </div>
+    </div>
+
+    <!-- 햄버거 메뉴 사이드바 -->
+    <div id="sidebarMenu" class="sidebar-menu hidden">
+        <div class="sidebar-header">
+            <h3>메뉴</h3>
+            <button id="closeSidebar" class="close-btn">×</button>
+        </div>
+        <div class="sidebar-content">
+            <div class="menu-section">
+                <h4>세션 관리</h4>
+                <ul class="session-list" id="sessionList">
+                    <li class="session-item current">
+                        <span class="session-title">현재 세션</span>
+                        <span class="session-time">방금 전</span>
+                    </li>
+                </ul>
+                <button id="newSessionBtn" class="menu-btn">+ 새 세션</button>
+            </div>
+            
+            <div class="menu-section">
+                <h4>빠른 기능</h4>
+                <button id="quickHelpBtn" class="menu-btn">🆘 도움말</button>
+                <button id="quickClearBtn" class="menu-btn">🗑️ 화면 지우기</button>
+                <button id="quickCopyBtn" class="menu-btn">📋 마지막 번역 복사</button>
+            </div>
+            
+            <div class="menu-section">
+                <h4>모드 변경</h4>
+                <div class="mode-buttons">
+                    <button class="mode-btn active" data-mode="auto">자동 감지</button>
+                    <button class="mode-btn" data-mode="korean">한→러</button>
+                    <button class="mode-btn" data-mode="russian">러→한</button>
+                </div>
+            </div>
+            
+            <div class="menu-section">
+                <h4>테마</h4>
+                <div class="theme-buttons">
+                    <button class="theme-btn active" data-theme="terminal">터미널</button>
+                    <button class="theme-btn" data-theme="warm">따뜻한</button>
+                    <button class="theme-btn" data-theme="soft">부드러운</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 사이드바 배경 오버레이 -->
+    <div id="sidebarOverlay" class="sidebar-overlay hidden"></div>
+
     <div class="terminal-container">
         <!-- 터미널 헤더 (맥OS 스타일) -->
         <div class="terminal-header">
@@ -179,6 +243,6 @@
     </div>
 
     <!-- JavaScript -->
-    <script src="/static/terminal.js"></script>
+    <script src="/static/terminal.js?v=scroll-fix-2"></script>
 </body>
 </html>

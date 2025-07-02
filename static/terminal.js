@@ -38,7 +38,22 @@ class KoreanTerminal {
             reconnectStatus: document.getElementById('reconnect-status'),
             manualReconnect: document.getElementById('manual-reconnect'),
             shortcutsHelp: document.getElementById('shortcuts-help'),
-            currentMode: document.getElementById('current-mode')
+            currentMode: document.getElementById('current-mode'),
+            
+            // 네비게이션 및 사이드바 요소들
+            hamburgerMenu: document.getElementById('hamburgerMenu'),
+            sidebarMenu: document.getElementById('sidebarMenu'),
+            sidebarOverlay: document.getElementById('sidebarOverlay'),
+            closeSidebar: document.getElementById('closeSidebar'),
+            settingsBtn: document.getElementById('settingsBtn'),
+            helpBtn: document.getElementById('helpBtn'),
+            
+            // 사이드바 기능 버튼들
+            quickHelpBtn: document.getElementById('quickHelpBtn'),
+            quickClearBtn: document.getElementById('quickClearBtn'),
+            quickCopyBtn: document.getElementById('quickCopyBtn'),
+            newSessionBtn: document.getElementById('newSessionBtn'),
+            sessionList: document.getElementById('sessionList')
         };
     }
 
@@ -54,6 +69,37 @@ class KoreanTerminal {
         document.getElementById('minimizeBtn')?.addEventListener('click', () => this.minimizeTerminal());
         document.getElementById('maximizeBtn')?.addEventListener('click', () => this.maximizeTerminal());
         document.getElementById('closeBtn')?.addEventListener('click', () => this.closeTerminal());
+        
+        // 네비게이션 및 사이드바 이벤트
+        this.elements.hamburgerMenu?.addEventListener('click', () => this.toggleSidebar());
+        this.elements.closeSidebar?.addEventListener('click', () => this.closeSidebar());
+        this.elements.sidebarOverlay?.addEventListener('click', () => this.closeSidebar());
+        this.elements.helpBtn?.addEventListener('click', () => this.showHelp());
+        this.elements.settingsBtn?.addEventListener('click', () => this.showSettings());
+        
+        // 사이드바 빠른 기능 버튼들
+        this.elements.quickHelpBtn?.addEventListener('click', () => this.executeCommand('/help'));
+        this.elements.quickClearBtn?.addEventListener('click', () => this.executeCommand('/clear'));
+        this.elements.quickCopyBtn?.addEventListener('click', () => this.copyLastTranslation());
+        this.elements.newSessionBtn?.addEventListener('click', () => this.createNewSession());
+        
+        // 모드 변경 버튼들
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const mode = e.target.dataset.mode;
+                this.executeCommand(`/mode ${mode}`);
+                this.updateModeButtons(mode);
+            });
+        });
+        
+        // 테마 변경 버튼들
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const theme = e.target.dataset.theme;
+                this.changeTheme(theme);
+                this.updateThemeButtons(theme);
+            });
+        });
         
         // 윈도우 포커스 이벤트
         window.addEventListener('focus', () => this.elements.input.focus());
@@ -109,7 +155,14 @@ class KoreanTerminal {
             this.reconnectAttempts = 0;
             this.updateConnectionStatus('connected', '🟢 연결됨');
             this.hideOfflineModal();
-            this.elements.input.focus();
+            
+            // 입력 필드 포커스 (약간의 지연을 둠)
+            setTimeout(() => {
+                if (this.elements.input) {
+                    this.elements.input.focus();
+                    this.elements.input.click();
+                }
+            }, 100);
         };
 
         this.websocket.onmessage = (event) => {
@@ -239,8 +292,9 @@ class KoreanTerminal {
         const text = this.elements.input.value.trim();
         if (!text) return;
 
-        if (!this.isConnected) {
-            this.addSystemMessage('연결이 끊어져 있습니다. 재연결을 기다려주세요.', 'error');
+        if (!this.isConnected || !this.websocket || this.websocket.readyState !== WebSocket.OPEN) {
+            this.addSystemMessage('연결이 끊어져 있습니다. 재연결을 시도합니다...', 'error');
+            this.reconnectWebSocket();
             return;
         }
 
@@ -265,7 +319,14 @@ class KoreanTerminal {
             mode: 'session' // 세션 모드 사용
         };
         
-        this.websocket.send(JSON.stringify(message));
+        try {
+            this.websocket.send(JSON.stringify(message));
+        } catch (error) {
+            console.error('메시지 전송 실패:', error);
+            this.addSystemMessage('메시지 전송에 실패했습니다. 재연결을 시도합니다.', 'error');
+            this.hideLoadingIndicator();
+            this.reconnectWebSocket();
+        }
     }
 
     addUserMessage(text) {
@@ -279,7 +340,11 @@ class KoreanTerminal {
         `;
         
         this.elements.output.appendChild(messageDiv);
-        this.scrollToBottom();
+        
+        // 메시지 추가 후 스크롤 (약간의 지연을 두어 렌더링 완료 대기)
+        setTimeout(() => {
+            this.scrollToBottom();
+        }, 100);
     }
 
     addAIMessage(content) {
@@ -322,7 +387,11 @@ class KoreanTerminal {
         `;
         
         this.elements.output.appendChild(messageDiv);
-        this.scrollToBottom();
+        
+        // 메시지 추가 후 스크롤 (약간의 지연을 두어 렌더링 완료 대기)
+        setTimeout(() => {
+            this.scrollToBottom();
+        }, 100);
     }
 
     typeMessage(element, text) {
@@ -475,8 +544,14 @@ class KoreanTerminal {
     reconnectWebSocket() {
         if (this.websocket) {
             this.websocket.close();
+            this.websocket = null;
         }
-        this.initializeWebSocket();
+        this.isConnected = false;
+        
+        // 짧은 대기 후 재연결
+        setTimeout(() => {
+            this.initializeWebSocket();
+        }, 1000);
     }
 
     toggleHelp() {
@@ -505,8 +580,39 @@ class KoreanTerminal {
     }
 
     scrollToBottom() {
-        if (this.autoScroll) {
-            this.elements.output.scrollTop = this.elements.output.scrollHeight;
+        if (this.autoScroll && this.elements.output) {
+            const outputElement = this.elements.output;
+            
+            // 강제 스크롤 - 여러 방법으로 시도
+            try {
+                // 방법 1: 즉시 스크롤
+                outputElement.scrollTop = outputElement.scrollHeight;
+                
+                // 방법 2: 다음 프레임에서 스크롤
+                requestAnimationFrame(() => {
+                    outputElement.scrollTop = outputElement.scrollHeight;
+                });
+                
+                // 방법 3: 마지막 요소로 스크롤
+                setTimeout(() => {
+                    const lastMessage = outputElement.lastElementChild;
+                    if (lastMessage) {
+                        lastMessage.scrollIntoView({ 
+                            behavior: 'auto', 
+                            block: 'end', 
+                            inline: 'nearest' 
+                        });
+                    }
+                }, 10);
+                
+                // 방법 4: 확실한 스크롤 (200ms 후)
+                setTimeout(() => {
+                    outputElement.scrollTop = outputElement.scrollHeight;
+                }, 200);
+                
+            } catch (error) {
+                console.error('스크롤 오류:', error);
+            }
         }
     }
 
@@ -525,22 +631,144 @@ class KoreanTerminal {
         div.textContent = text;
         return div.innerHTML;
     }
+
+    // 사이드바 관련 메서드들
+    toggleSidebar() {
+        const isOpen = !this.elements.sidebarMenu.classList.contains('hidden');
+        if (isOpen) {
+            this.closeSidebar();
+        } else {
+            this.openSidebar();
+        }
+    }
+
+    openSidebar() {
+        this.elements.sidebarMenu.classList.remove('hidden');
+        this.elements.sidebarOverlay.classList.remove('hidden');
+        this.elements.hamburgerMenu.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeSidebar() {
+        this.elements.sidebarMenu.classList.add('hidden');
+        this.elements.sidebarOverlay.classList.add('hidden');
+        this.elements.hamburgerMenu.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // 명령어 실행 (버튼에서 호출)
+    executeCommand(command) {
+        this.elements.input.value = command;
+        this.sendMessage();
+        this.closeSidebar();
+    }
+
+    // 마지막 번역 결과 복사
+    copyLastTranslation() {
+        const lastAIMessage = this.elements.output.querySelector('.message-ai:last-of-type .message-content');
+        if (lastAIMessage) {
+            const textToCopy = lastAIMessage.textContent || lastAIMessage.innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                this.addSystemMessage('번역 결과가 클립보드에 복사되었습니다.', 'success');
+            }).catch(() => {
+                this.addSystemMessage('복사에 실패했습니다.', 'error');
+            });
+        } else {
+            this.addSystemMessage('복사할 번역 결과가 없습니다.', 'warning');
+        }
+        this.closeSidebar();
+    }
+
+    // 새 세션 생성
+    createNewSession() {
+        this.clearScreen();
+        // 새 세션 ID 생성 및 저장 로직 (향후 구현)
+        this.addSystemMessage('새 세션이 시작되었습니다.', 'success');
+        this.closeSidebar();
+    }
+
+    // 모드 버튼 업데이트
+    updateModeButtons(activeMode) {
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.mode === activeMode) {
+                btn.classList.add('active');
+            }
+        });
+    }
+
+    // 테마 변경
+    changeTheme(theme) {
+        const container = document.querySelector('.terminal-container');
+        // 기존 테마 클래스 제거
+        container.classList.remove('theme-terminal', 'theme-warm', 'theme-soft');
+        
+        // 새 테마 적용
+        if (theme !== 'terminal') {
+            container.classList.add(`theme-${theme}`);
+        }
+        
+        // 테마 설정 저장
+        localStorage.setItem('terminal-theme', theme);
+    }
+
+    // 테마 버튼 업데이트
+    updateThemeButtons(activeTheme) {
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.theme === activeTheme) {
+                btn.classList.add('active');
+            }
+        });
+    }
+
+    // 도움말 표시
+    showHelp() {
+        this.executeCommand('/help');
+    }
+
+    // 설정 표시 (향후 구현)
+    showSettings() {
+        this.addSystemMessage('설정 기능은 곧 추가될 예정입니다.', 'info');
+    }
 }
 
 // 터미널 초기화
 document.addEventListener('DOMContentLoaded', () => {
-    window.terminal = new KoreanTerminal();
-    
-    // 개발자 도구용 전역 함수들
-    window.terminalUtils = {
-        sendTestMessage: (text) => window.terminal.addUserMessage(text),
-        clearScreen: () => window.terminal.clearScreen(),
-        showStats: () => console.log(window.terminal.stats),
-        reconnect: () => window.terminal.reconnectWebSocket()
-    };
-    
-    console.log('🚀 Korean Learning Terminal 초기화 완료');
-    console.log('💡 개발자 도구에서 terminalUtils 객체를 사용할 수 있습니다.');
+    // 약간의 지연을 두고 초기화 (DOM 완전 로드 대기)
+    setTimeout(() => {
+        window.terminal = new KoreanTerminal();
+        
+        // 개발자 도구용 전역 함수들
+        window.terminalUtils = {
+            sendTestMessage: (text) => window.terminal.addUserMessage(text),
+            clearScreen: () => window.terminal.clearScreen(),
+            showStats: () => console.log(window.terminal.stats),
+            reconnect: () => window.terminal.reconnectWebSocket(),
+            focusInput: () => window.terminal.elements.input.focus(),
+            scrollToBottom: () => window.terminal.scrollToBottom(),
+            checkScroll: () => {
+                const output = window.terminal.elements.output;
+                console.log('스크롤 정보:', {
+                    scrollTop: output.scrollTop,
+                    scrollHeight: output.scrollHeight,
+                    clientHeight: output.clientHeight,
+                    offsetHeight: output.offsetHeight,
+                    isAtBottom: output.scrollTop + output.clientHeight >= output.scrollHeight - 10,
+                    canScroll: output.scrollHeight > output.clientHeight
+                });
+            },
+            addTestMessages: () => {
+                for (let i = 1; i <= 20; i++) {
+                    window.terminal.addUserMessage(`테스트 메시지 ${i} - 스크롤 테스트를 위한 긴 메시지입니다. 이 메시지가 충분히 많아지면 스크롤이 생겨야 합니다.`);
+                }
+            }
+        };
+        
+        console.log('🚀 Korean Learning Terminal 초기화 완료');
+        console.log('💡 개발자 도구에서 terminalUtils 객체를 사용할 수 있습니다.');
+        console.log('🔧 입력이 안 되면 F12 개발자도구에서 terminalUtils.focusInput() 실행해보세요.');
+    }, 200);
 });
 
 // 전역 에러 핸들러

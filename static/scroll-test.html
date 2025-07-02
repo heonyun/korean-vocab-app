@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스크롤 테스트</title>
+    <style>
+        body { margin: 0; padding: 20px; font-family: monospace; }
+        .test-container {
+            width: 100%;
+            max-width: 800px;
+            height: 400px;
+            border: 2px solid #333;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .test-header {
+            background: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        .test-output {
+            flex: 1;
+            padding: 20px;
+            overflow-y: scroll !important;
+            overflow-x: hidden;
+            background: #000;
+            color: #0f0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .test-input {
+            padding: 10px;
+            background: #222;
+            display: flex;
+            gap: 10px;
+        }
+        .test-input input {
+            flex: 1;
+            background: #000;
+            color: #0f0;
+            border: 1px solid #333;
+            padding: 5px;
+        }
+        .test-input button {
+            background: #0f0;
+            color: #000;
+            border: none;
+            padding: 5px 15px;
+            cursor: pointer;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 5px;
+            border-left: 3px solid #0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>스크롤 테스트 - 터미널 스타일</h1>
+    
+    <div class="test-container">
+        <div class="test-header">터미널 스크롤 테스트</div>
+        <div id="testOutput" class="test-output">
+            <div class="message">환영합니다! 스크롤 테스트를 시작합니다.</div>
+        </div>
+        <div class="test-input">
+            <input type="text" id="testInput" placeholder="메시지 입력 후 엔터...">
+            <button onclick="addMessage()">전송</button>
+            <button onclick="addManyMessages()">10개 추가</button>
+        </div>
+    </div>
+
+    <script>
+        let messageCount = 0;
+        
+        function addMessage(text = null) {
+            const output = document.getElementById('testOutput');
+            const input = document.getElementById('testInput');
+            
+            const message = text || input.value || `테스트 메시지 #${++messageCount}`;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            
+            output.appendChild(messageDiv);
+            
+            // 스크롤을 맨 아래로
+            output.scrollTop = output.scrollHeight;
+            
+            // 입력 필드 클리어
+            input.value = '';
+            
+            console.log('스크롤 정보:', {
+                scrollTop: output.scrollTop,
+                scrollHeight: output.scrollHeight,
+                clientHeight: output.clientHeight
+            });
+        }
+        
+        function addManyMessages() {
+            for (let i = 1; i <= 10; i++) {
+                setTimeout(() => {
+                    addMessage(`자동 메시지 ${i}/10 - 긴 텍스트로 테스트합니다. 이 메시지는 스크롤을 테스트하기 위해 길게 작성되었습니다.`);
+                }, i * 200);
+            }
+        }
+        
+        // 엔터키 지원
+        document.getElementById('testInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                addMessage();
+            }
+        });
+        
+        // 초기 메시지들 추가
+        setTimeout(() => {
+            addMessage('첫 번째 메시지입니다.');
+            addMessage('두 번째 메시지입니다.');
+            addMessage('세 번째 메시지입니다.');
+        }, 500);
+    </script>
+</body>
+</html>
