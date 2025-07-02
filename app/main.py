@@ -38,18 +38,11 @@ app = FastAPI(
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
 async def home(request: Request):
-    """메인 페이지"""
-    vocabulary_list = storage.load_all()
-    return templates.TemplateResponse(
-        "index.html", 
-        {
-            "request": request, 
-            "vocabulary_count": len(vocabulary_list),
-            "vocabulary_list": vocabulary_list[-10:]  # 최근 10개만 표시
-        }
-    )
+    """메인 페이지 - 채팅 인터페이스로 리다이렉트"""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/chat", status_code=302)
 
 # PWA 관련 라우트들
 @app.get("/manifest.json")
