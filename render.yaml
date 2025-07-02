@@ -3,7 +3,7 @@ services:
     name: korean-vocab-app
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements-web.txt
     startCommand: python run.py
     envVars:
       - key: GOOGLE_API_KEY
