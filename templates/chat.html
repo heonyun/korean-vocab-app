@@ -9,7 +9,7 @@
     <link rel="manifest" href="/static/manifest.json">
     
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#667eea">
+    <meta name="theme-color" content="#F0A8D0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Korean Chat">
@@ -27,17 +27,24 @@
                 extend: {
                     colors: {
                         primary: {
-                            50: '#f0f4ff',
-                            500: '#667eea',
-                            600: '#5a6fd8',
-                            700: '#4c63d2'
+                            50: '#fef7f4',
+                            400: '#FFC6C6',
+                            500: '#F0A8D0',
+                            600: '#E996C7',
+                            700: '#E284BE'
                         },
                         chat: {
-                            bg: '#f7fafc',
-                            'bg-dark': '#1a202c',
-                            user: '#667eea',
-                            ai: '#e2e8f0',
-                            'ai-dark': '#2d3748'
+                            bg: '#FFEBD4',
+                            'bg-dark': '#3d2b20',
+                            user: '#F0A8D0',
+                            ai: '#FFC6C6',
+                            'ai-dark': '#4a3529'
+                        },
+                        pink: {
+                            light: '#FFEBD4',
+                            coral: '#FFC6C6', 
+                            soft: '#F7B5CA',
+                            main: '#F0A8D0'
                         }
                     },
                     maxWidth: {
@@ -75,32 +82,32 @@
         
         .message-user {
             margin-left: auto;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #F0A8D0 0%, #E284BE 100%);
             color: white;
         }
         
         .message-ai {
             margin-right: auto;
-            background: #e2e8f0;
-            color: #2d3748;
+            background: #FFC6C6;
+            color: #4a2c29;
         }
         
         .dark .message-ai {
-            background: #2d3748;
-            color: #e2e8f0;
+            background: #4a3529;
+            color: #FFC6C6;
         }
         
         .message-system {
             margin: 0 auto;
-            background: #fed7d7;
-            color: #c53030;
+            background: #FFEBD4;
+            color: #8b5a3c;
             text-align: center;
             font-size: 0.875rem;
         }
         
         .dark .message-system {
-            background: #742a2a;
-            color: #fed7d7;
+            background: #5a3c26;
+            color: #FFEBD4;
         }
         
         @keyframes slideIn {
@@ -143,12 +150,12 @@
         }
         
         .chat-messages::-webkit-scrollbar-thumb {
-            background: #cbd5e0;
+            background: #F7B5CA;
             border-radius: 2px;
         }
         
         .dark .chat-messages::-webkit-scrollbar-thumb {
-            background: #4a5568;
+            background: #8b5a3c;
         }
         
         /* 데스크탑 사이드바 레이아웃 */
@@ -157,11 +164,11 @@
                 transform: translateX(0) !important;
                 position: fixed !important;
                 width: 320px !important;
-                border-right: 1px solid #e5e7eb;
+                border-right: 1px solid #F7B5CA;
             }
             
             .dark .hamburger-menu {
-                border-right: 1px solid #374151;
+                border-right: 1px solid #8b5a3c;
             }
             
             .main-chat-container {
@@ -213,11 +220,11 @@
     <div id="menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
     
     <!-- 햄버거 메뉴 -->
-    <div id="hamburger-menu" class="hamburger-menu fixed left-0 top-0 h-full w-80 max-w-sm bg-white dark:bg-gray-800 shadow-xl z-50 flex flex-col">
+    <div id="hamburger-menu" class="hamburger-menu fixed left-0 top-0 h-full w-80 max-w-sm bg-pink-light dark:bg-chat-bg-dark shadow-xl z-50 flex flex-col">
         <div class="p-6 flex-shrink-0">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-bold text-gray-800 dark:text-white">Korean Chat</h2>
-                <button id="close-menu" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                <button id="close-menu" class="p-2 rounded-lg hover:bg-pink-coral dark:hover:bg-chat-ai-dark">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -226,7 +233,7 @@
             
             <!-- 상단 메뉴 -->
             <div class="space-y-3">
-                <button id="new-chat-btn" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <button id="new-chat-btn" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-pink-coral dark:hover:bg-chat-ai-dark transition-colors">
                     <span class="text-xl">💬</span>
                     <span>새 대화 시작</span>
                 </button>
@@ -248,13 +255,13 @@
             
             <!-- 하단 고정 영역: 북마크 & 복습 -->
             <div class="border-t border-gray-200 dark:border-gray-600 mt-4 pt-4 space-y-2 flex-shrink-0">
-                <button id="bookmarks-btn" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <button id="bookmarks-btn" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-pink-coral dark:hover:bg-chat-ai-dark transition-colors">
                     <span class="text-xl">🦊</span>
                     <span>북마크 보기</span>
                     <span id="bookmark-count" class="ml-auto text-xs bg-primary-500 text-white px-2 py-1 rounded-full">0</span>
                 </button>
                 
-                <button id="review-btn" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <button id="review-btn" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-pink-coral dark:hover:bg-chat-ai-dark transition-colors">
                     <span class="text-xl">📚</span>
                     <span>복습하기</span>
                     <span id="review-count" class="ml-auto text-xs bg-orange-500 text-white px-2 py-1 rounded-full">0</span>
@@ -264,7 +271,7 @@
     </div>
     
     <!-- 메인 채팅 컨테이너 -->
-    <div class="chat-container main-chat-container max-w-chat mx-auto bg-white dark:bg-gray-900 shadow-lg">
+    <div class="chat-container main-chat-container max-w-chat mx-auto bg-white dark:bg-chat-bg-dark shadow-lg">
         <!-- 헤더 -->
         <header class="bg-primary-500 text-white p-4 flex items-center justify-between shadow-md">
             <div class="flex items-center space-x-3">
@@ -309,7 +316,7 @@
         </div>
         
         <!-- 입력 영역 -->
-        <div class="p-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+        <div class="p-4 bg-pink-light dark:bg-chat-bg-dark border-t border-pink-soft dark:border-chat-ai-dark">
             <form id="chat-form" class="flex space-x-3">
                 <input 
                     type="text" 
@@ -335,13 +342,13 @@
     <!-- 복습 모달 -->
     <div id="review-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
         <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-hidden">
+            <div class="bg-pink-light dark:bg-chat-bg-dark rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-hidden">
                 <!-- 모달 헤더 -->
                 <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-600">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                         📚 복습하기
                     </h3>
-                    <button id="close-review-modal" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <button id="close-review-modal" class="p-2 rounded-lg hover:bg-pink-coral dark:hover:bg-chat-ai-dark">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -382,7 +389,7 @@
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                         🦊 북마크 목록
                     </h3>
-                    <button id="close-bookmarks-modal" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <button id="close-bookmarks-modal" class="p-2 rounded-lg hover:bg-pink-coral dark:hover:bg-chat-ai-dark">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -429,7 +436,7 @@
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                         ⚙️ 설정
                     </h3>
-                    <button id="close-settings-modal" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <button id="close-settings-modal" class="p-2 rounded-lg hover:bg-pink-coral dark:hover:bg-chat-ai-dark">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
