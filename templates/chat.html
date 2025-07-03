@@ -151,10 +151,57 @@
             background: #4a5568;
         }
         
-        /* 모바일 터치 최적화 */
-        @media (max-width: 768px) {
+        /* 데스크탑 사이드바 레이아웃 */
+        @media (min-width: 1024px) {
+            .hamburger-menu {
+                transform: translateX(0) !important;
+                position: fixed !important;
+                width: 320px !important;
+                border-right: 1px solid #e5e7eb;
+            }
+            
+            .dark .hamburger-menu {
+                border-right: 1px solid #374151;
+            }
+            
+            .main-chat-container {
+                margin-left: 320px;
+            }
+            
+            #menu-toggle {
+                display: none;
+            }
+            
+            #close-menu {
+                display: none;
+            }
+            
+            #menu-overlay {
+                display: none !important;
+            }
+        }
+        
+        /* 태블릿 및 모바일 터치 최적화 */
+        @media (max-width: 1023px) {
             .message-bubble {
                 max-width: 90%;
+            }
+        }
+        
+        /* 모바일 텍스트 크기 개선 */
+        @media (max-width: 768px) {
+            .message-bubble {
+                font-size: 16px;
+                line-height: 1.5;
+            }
+            
+            .usage-example {
+                font-size: 15px !important;
+                line-height: 1.4;
+            }
+            
+            .bookmark-card .text-sm {
+                font-size: 15px !important;
             }
         }
     </style>
@@ -197,11 +244,6 @@
                 
                 <div class="border-t border-gray-200 dark:border-gray-600 my-4"></div>
                 
-                <button id="toggle-theme" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                    <span class="text-xl">🌙</span>
-                    <span>다크모드</span>
-                </button>
-                
                 <button id="bookmarks-btn" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                     <span class="text-xl">🦊</span>
                     <span>북마크 보기</span>
@@ -213,22 +255,12 @@
                     <span>복습하기</span>
                     <span id="review-count" class="ml-auto text-xs bg-orange-500 text-white px-2 py-1 rounded-full">0</span>
                 </button>
-                
-                <button id="voice-settings" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                    <span class="text-xl">🔊</span>
-                    <span>음성 설정</span>
-                </button>
-                
-                <button id="clear-current-chat" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-red-600 dark:text-red-400">
-                    <span class="text-xl">🗑️</span>
-                    <span>현재 대화 지우기</span>
-                </button>
             </nav>
         </div>
     </div>
     
     <!-- 메인 채팅 컨테이너 -->
-    <div class="chat-container max-w-chat mx-auto bg-white dark:bg-gray-900 shadow-lg">
+    <div class="chat-container main-chat-container max-w-chat mx-auto bg-white dark:bg-gray-900 shadow-lg">
         <!-- 헤더 -->
         <header class="bg-primary-500 text-white p-4 flex items-center justify-between shadow-md">
             <div class="flex items-center space-x-3">
@@ -384,6 +416,64 @@
         </div>
     </div>
     
+    <!-- 설정 모달 -->
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
+                <!-- 모달 헤더 -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-600">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        ⚙️ 설정
+                    </h3>
+                    <button id="close-settings-modal" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- 모달 콘텐츠 -->
+                <div class="p-4 space-y-4">
+                    <!-- 다크모드 토글 -->
+                    <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-xl">🌙</span>
+                            <span class="font-medium">다크모드</span>
+                        </div>
+                        <button id="toggle-theme-modal" class="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-300 dark:bg-primary-500 transition-colors">
+                            <span class="sr-only">다크모드 토글</span>
+                            <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform dark:translate-x-6 translate-x-1"></span>
+                        </button>
+                    </div>
+                    
+                    <!-- 음성 설정 -->
+                    <div class="p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <span class="text-xl">🔊</span>
+                            <span class="font-medium">음성 설정</span>
+                        </div>
+                        <div class="ml-8">
+                            <label class="block text-sm text-gray-600 dark:text-gray-400 mb-2">재생 속도</label>
+                            <input type="range" id="voice-speed-modal" min="0.5" max="2" step="0.1" value="0.8" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>0.5x</span>
+                                <span id="speed-display-modal">0.8x</span>
+                                <span>2.0x</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 현재 대화 지우기 -->
+                    <button id="clear-current-chat-modal" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-red-600 dark:text-red-400">
+                        <span class="text-xl">🗑️</span>
+                        <span class="font-medium">현재 대화 지우기</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- JavaScript -->
     <script>
         // 전역 변수
@@ -420,6 +510,13 @@
         menuToggle.addEventListener('click', toggleMenu);
         closeMenu.addEventListener('click', closeMenuHandler);
         menuOverlay.addEventListener('click', closeMenuHandler);
+        
+        // 설정 모달 관련 이벤트 리스너
+        document.getElementById('settings-btn').addEventListener('click', openSettingsModal);
+        document.getElementById('close-settings-modal').addEventListener('click', closeSettingsModal);
+        document.getElementById('toggle-theme-modal').addEventListener('click', toggleTheme);
+        document.getElementById('voice-speed-modal').addEventListener('input', updateVoiceSpeed);
+        document.getElementById('clear-current-chat-modal').addEventListener('click', clearCurrentChat);
         
         // 메시지 전송
         chatForm.addEventListener('submit', async (e) => {
@@ -762,8 +859,32 @@
                 const isBookmarked = button.textContent === '🦊';
                 
                 if (isBookmarked) {
-                    // 북마크 제거 (향후 구현)
-                    console.log('북마크 제거 기능은 향후 구현 예정');
+                    // 북마크 제거
+                    const removeResponse = await fetch('/api/bookmarks/remove', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            session_id: currentSessionId,
+                            message_id: messageId
+                        })
+                    });
+                    
+                    const removeData = await removeResponse.json();
+                    
+                    if (removeData.success) {
+                        // 북마크 버튼을 다시 하얀 하트로 변경
+                        button.textContent = '🤍';
+                        button.title = '북마크 추가';
+                        
+                        // 북마크 카운트 업데이트
+                        await updateBookmarkCounts();
+                        
+                        console.log('북마크 제거됨');
+                    } else {
+                        console.error('북마크 제거 실패:', removeData.error);
+                    }
                     return;
                 }
                 
@@ -896,8 +1017,8 @@
                         </div>
                         <div class="flex items-center gap-2 ml-4">
                             <span class="text-xs text-gray-400">${createdDate}</span>
-                            <button onclick="deleteBookmark('${bookmark.id}')" class="text-red-500 hover:text-red-700 p-1" title="삭제">
-                                🗑️
+                            <button onclick="deleteBookmark('${bookmark.id}')" class="text-orange-500 hover:text-orange-700 px-2 py-1 text-xs font-medium rounded hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors" title="북마크 해제">
+                                🦊 해제
                             </button>
                         </div>
                     </div>
@@ -905,7 +1026,7 @@
                     ${bookmark.usage_examples && bookmark.usage_examples.length > 0 ? `
                         <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-600">
                             <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">활용 예문:</div>
-                            ${bookmark.usage_examples.slice(0, 2).map(example => `
+                            ${bookmark.usage_examples.slice(0, 3).map(example => `
                                 <div class="text-sm mb-2 p-2 bg-gray-50 dark:bg-gray-600 rounded">
                                     <div class="text-gray-800 dark:text-gray-200">${example.korean_sentence}</div>
                                     <div class="text-gray-600 dark:text-gray-400">${example.russian_translation}</div>
@@ -926,7 +1047,7 @@
         }
         
         async function deleteBookmark(bookmarkId) {
-            if (!confirm('이 북마크를 삭제하시겠습니까?')) {
+            if (!confirm('이 북마크를 해제하시겠습니까?')) {
                 return;
             }
             
@@ -1134,6 +1255,124 @@
             } else if (direction === 'next' && currentReviewIndex < reviewBookmarks.length - 1) {
                 currentReviewIndex++;
                 showCurrentReviewCard();
+            }
+        }
+        
+        // ============= 설정 모달 관련 함수들 =============
+        
+        // 설정 모달 열기
+        function openSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            // 현재 다크모드 상태에 따라 토글 버튼 상태 업데이트
+            updateDarkModeToggle();
+            
+            // 현재 음성 속도 표시
+            updateVoiceSpeedDisplay();
+        }
+        
+        // 설정 모달 닫기
+        function closeSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        
+        // 다크모드 토글
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateDarkModeToggle();
+        }
+        
+        // 다크모드 토글 버튼 상태 업데이트
+        function updateDarkModeToggle() {
+            const toggle = document.getElementById('toggle-theme-modal');
+            const isDark = document.documentElement.classList.contains('dark');
+            
+            if (isDark) {
+                toggle.classList.add('bg-primary-500');
+                toggle.classList.remove('bg-gray-300');
+                toggle.querySelector('span:last-child').classList.add('translate-x-6');
+                toggle.querySelector('span:last-child').classList.remove('translate-x-1');
+            } else {
+                toggle.classList.remove('bg-primary-500');
+                toggle.classList.add('bg-gray-300');
+                toggle.querySelector('span:last-child').classList.remove('translate-x-6');
+                toggle.querySelector('span:last-child').classList.add('translate-x-1');
+            }
+        }
+        
+        // 음성 속도 업데이트
+        function updateVoiceSpeed() {
+            const slider = document.getElementById('voice-speed-modal');
+            const display = document.getElementById('speed-display-modal');
+            const speed = parseFloat(slider.value);
+            
+            display.textContent = speed.toFixed(1) + 'x';
+            
+            // 로컬 스토리지에 저장
+            localStorage.setItem('voiceSpeed', speed);
+        }
+        
+        // 음성 속도 표시 업데이트
+        function updateVoiceSpeedDisplay() {
+            const savedSpeed = localStorage.getItem('voiceSpeed') || '0.8';
+            const slider = document.getElementById('voice-speed-modal');
+            const display = document.getElementById('speed-display-modal');
+            
+            slider.value = savedSpeed;
+            display.textContent = parseFloat(savedSpeed).toFixed(1) + 'x';
+        }
+        
+        // 현재 대화 지우기
+        async function clearCurrentChat() {
+            if (!currentSessionId) {
+                alert('삭제할 대화가 없습니다.');
+                return;
+            }
+            
+            if (!confirm('현재 대화를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/chat/sessions/${currentSessionId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    // 채팅 화면 초기화
+                    chatMessages.innerHTML = `
+                        <div class="message-bubble message-system rounded-lg p-3 mx-8 text-center">
+                            <div class="font-medium mb-2">👋 안녕하세요! 한국어 ↔ 러시아어 번역을 도와드릴게요!</div>
+                            <div class="text-xs text-gray-600 dark:text-gray-400 mb-2">💡 팁: /로 상황을 설명할 수 있어요!</div>
+                            <div class="text-xs italic text-purple-600 dark:text-purple-400 mb-1">For Emma, my eternal Muse</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-500">v0.1.5</div>
+                        </div>
+                    `;
+                    
+                    // 세션 ID 초기화
+                    currentSessionId = null;
+                    updateSessionInfo();
+                    
+                    // 설정 모달 닫기
+                    closeSettingsModal();
+                    
+                    // 세션 목록 새로고침
+                    if (hamburgerMenu.classList.contains('open')) {
+                        loadSessionList();
+                    }
+                    
+                    alert('대화가 삭제되었습니다.');
+                } else {
+                    alert('대화 삭제에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('대화 삭제 오류:', error);
+                alert('대화 삭제 중 오류가 발생했습니다.');
             }
         }
         
