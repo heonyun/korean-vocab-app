@@ -814,15 +814,7 @@
             }
         });
         
-        // 다크모드 토글
-        document.getElementById('toggle-theme').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            const isDark = document.documentElement.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            
-            const button = document.getElementById('toggle-theme');
-            button.querySelector('span').textContent = isDark ? '☀️' : '🌙';
-        });
+        // 다크모드 토글 (이전 버전 호환성을 위해 제거됨 - 설정 모달에서 처리)
         
         // 초기화
         // TTS 음성 재생 함수
@@ -1400,7 +1392,6 @@
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');
-                document.getElementById('toggle-theme').querySelector('span').textContent = '☀️';
             }
             
             // TTS 음성 로드 (브라우저 호환성)
