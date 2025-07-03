@@ -166,6 +166,8 @@
             
             .main-chat-container {
                 margin-left: 320px;
+                max-width: none;
+                width: calc(100% - 320px);
             }
             
             #menu-toggle {
@@ -686,25 +688,42 @@
             `;
             
             try {
+                console.log('세션 목록 로드 시작...');
                 const response = await fetch('/api/chat/sessions');
-                const data = await response.json();
+                console.log('세션 API 응답 상태:', response.status);
                 
-                if (data.success && data.sessions.length > 0) {
-                    sessionList.innerHTML = data.sessions.map(session => `
-                        <button 
-                            class="w-full text-left p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                            onclick="loadSession('${session.session_id}')"
-                        >
-                            <div class="text-sm font-medium truncate">${session.title}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                ${session.message_count}개 메시지 • ${new Date(session.last_updated).toLocaleDateString()}
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('세션 데이터:', data);
+                
+                if (data.success) {
+                    if (data.sessions && data.sessions.length > 0) {
+                        sessionList.innerHTML = data.sessions.map(session => `
+                            <button 
+                                class="w-full text-left p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                onclick="loadSession('${session.session_id}')"
+                            >
+                                <div class="text-sm font-medium truncate">${session.title || '제목 없음'}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                    ${session.message_count || 0}개 메시지 • ${new Date(session.last_updated || session.created_at).toLocaleDateString()}
+                                </div>
+                            </button>
+                        `).join('');
+                    } else {
+                        sessionList.innerHTML = `
+                            <div class="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
+                                저장된 대화가 없습니다
                             </div>
-                        </button>
-                    `).join('');
+                        `;
+                    }
                 } else {
+                    console.error('세션 목록 API 실패:', data.error);
                     sessionList.innerHTML = `
-                        <div class="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
-                            저장된 대화가 없습니다
+                        <div class="text-center py-4 text-red-500 text-sm">
+                            ${data.error || '로드 실패'}
                         </div>
                     `;
                 }
@@ -712,7 +731,7 @@
                 console.error('세션 목록 로드 오류:', error);
                 sessionList.innerHTML = `
                     <div class="text-center py-4 text-red-500 text-sm">
-                        로드 실패
+                        연결 오류: ${error.message}
                     </div>
                 `;
             }
