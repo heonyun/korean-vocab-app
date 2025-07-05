@@ -64,11 +64,13 @@
         <button hx-get="/htmx/vocabulary-list" 
                 hx-target="#vocabulary-list-container"
                 hx-trigger="click"
-                class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200">
+                class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                title="저장된 어휘 목록을 새로고침합니다">
             📚 목록 새로고침
         </button>
         <button onclick="clearResult()" 
-                class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200">
+                class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                title="생성된 어휘 결과를 지웁니다">
             🗑️ 지우기
         </button>
     </div>

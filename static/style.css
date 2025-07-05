@@ -1,37 +1,37 @@
-/* CSS 변수 - 라이트 테마 */
+/* CSS 변수 - 기본 테마 (크림) */
 :root {
     /* 색상 변수 */
-    --bg-gradient-start: #667eea;
-    --bg-gradient-end: #764ba2;
-    --text-primary: #333333;
-    --text-secondary: #666666;
-    --text-muted: #999999;
+    --bg-gradient-start: #555879;
+    --bg-gradient-end: #98A1BC;
+    --text-primary: #2d2d3a;
+    --text-secondary: #555879;
+    --text-muted: #8a8a8a;
     --text-white: #ffffff;
     --text-on-primary: #ffffff;
     
     /* 배경 색상 */
-    --bg-main: rgba(255, 255, 255, 0.95);
-    --bg-card: #ffffff;
-    --bg-overlay: rgba(0, 0, 0, 0.7);
+    --bg-main: rgba(244, 235, 211, 0.95);
+    --bg-card: #F4EBD3;
+    --bg-overlay: rgba(85, 88, 121, 0.8);
     --bg-input: #ffffff;
-    --bg-secondary: #f8f9fa;
+    --bg-secondary: #DED3C4;
     
     /* 테두리 색상 */
-    --border-light: #e0e0e0;
-    --border-focus: #667eea;
+    --border-light: #DED3C4;
+    --border-focus: #555879;
     
     /* 버튼 색상 */
-    --btn-primary: #667eea;
-    --btn-primary-hover: #5a6fd8;
-    --btn-secondary: #4CAF50;
-    --btn-secondary-hover: #45a049;
-    --btn-danger: #f44336;
-    --btn-danger-hover: #da190b;
+    --btn-primary: #555879;
+    --btn-primary-hover: #4a4d6b;
+    --btn-secondary: #98A1BC;
+    --btn-secondary-hover: #8a94b0;
+    --btn-danger: #d63384;
+    --btn-danger-hover: #b02a5b;
     
     /* 그림자 */
-    --shadow-light: 0 2px 5px rgba(0,0,0,0.1);
-    --shadow-medium: 0 5px 15px rgba(0,0,0,0.15);
-    --shadow-heavy: 0 15px 35px rgba(0,0,0,0.2);
+    --shadow-light: 0 2px 5px rgba(85, 88, 121, 0.15);
+    --shadow-medium: 0 5px 15px rgba(85, 88, 121, 0.2);
+    --shadow-heavy: 0 15px 35px rgba(85, 88, 121, 0.25);
 }
 
 /* 다크 테마 */
@@ -106,16 +106,16 @@
     --shadow-heavy: 0 15px 35px rgba(85, 88, 121, 0.25);
 }
 
-/* 민트 그레이 테마 */
+/* 민트 그레이 테마 - Color Hunt 팔레트 2 */
 [data-theme="mint"] {
-    /* 색상 변수 */
-    --bg-gradient-start: #333446;
-    --bg-gradient-end: #7F8CAA;
-    --text-primary: #2d2d3a;
-    --text-secondary: #333446;
-    --text-muted: #8a8a8a;
+    /* 색상 변수 - 민트/세이지 그린 중심 */
+    --bg-gradient-start: #B8CFCE;
+    --bg-gradient-end: #EAEFEF;
+    --text-primary: #333446;
+    --text-secondary: #7F8CAA;
+    --text-muted: #7F8CAA;
     --text-white: #ffffff;
-    --text-on-primary: #ffffff;
+    --text-on-primary: #333446;
     
     /* 배경 색상 */
     --bg-main: rgba(234, 239, 239, 0.95);
@@ -142,14 +142,14 @@
     --shadow-heavy: 0 15px 35px rgba(51, 52, 70, 0.25);
 }
 
-/* 네이비 크림 테마 */
+/* 네이비 크림 테마 - Color Hunt 팔레트 3 */
 [data-theme="navy"] {
-    /* 색상 변수 */
+    /* 색상 변수 - 네이비와 크림 대비 */
     --bg-gradient-start: #213448;
-    --bg-gradient-end: #547792;
+    --bg-gradient-end: #94B4C1;
     --text-primary: #213448;
     --text-secondary: #547792;
-    --text-muted: #8a8a8a;
+    --text-muted: #547792;
     --text-white: #ffffff;
     --text-on-primary: #ffffff;
     
@@ -183,6 +183,12 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 body {
@@ -261,6 +267,7 @@ body {
     border-radius: 20px;
     padding: 2rem;
     box-shadow: var(--shadow-heavy);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
 }
@@ -336,6 +343,11 @@ body {
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 10px;
+}
+
+@-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
 }
 
 @keyframes spin {
@@ -472,6 +484,11 @@ body {
 .example-play-btn.playing-audio {
     background: #ff5722;
     animation: pulse 1s infinite;
+}
+
+@-webkit-keyframes pulse {
+    0%, 100% { -webkit-transform: scale(1); }
+    50% { -webkit-transform: scale(1.1); }
 }
 
 @keyframes pulse {
@@ -803,6 +820,7 @@ body {
 }
 
 #playback-rate-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
     appearance: none;
     width: 20px;
     height: 20px;
@@ -894,6 +912,10 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .theme-option:hover {
@@ -917,10 +939,6 @@ body {
 }
 
 /* 각 테마 미리보기 색상 */
-.theme-light {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
 .theme-dark {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
 }
