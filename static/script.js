@@ -186,7 +186,7 @@ function displayVocabularyResult(data) {
         exampleDiv.innerHTML = `
             <div class="example-header">
                 <div class="example-korean">${example.korean_sentence}</div>
-                <button onclick="playExamplePronunciation('${example.korean_sentence.replace(/'/g, "\\'")}', ${index})" 
+                <button onclick="playExamplePronunciation(\`${example.korean_sentence}\`, ${index})" 
                         class="example-play-btn" title="발음 듣기">🔊</button>
             </div>
             <div class="example-russian">${example.russian_translation}</div>
@@ -390,7 +390,7 @@ function createVocabularyDetailHTML(data) {
             <div class="example-item">
                 <div class="example-header">
                     <div class="example-korean">${example.korean_sentence}</div>
-                    <button onclick="playExamplePronunciation('${example.korean_sentence.replace(/'/g, "\\'")}', ${index})" 
+                    <button onclick="playExamplePronunciation(\`${example.korean_sentence}\`, ${index})" 
                             class="example-play-btn" title="발음 듣기">🔊</button>
                 </div>
                 <div class="example-russian">${example.russian_translation}</div>
@@ -434,7 +434,7 @@ function playModalPronunciation(word) {
     if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(word);
         utterance.lang = 'ko-KR';
-        utterance.rate = 0.8;
+        utterance.rate = getPlaybackRate(); // 사용자 설정 재생 속도 사용
         window.speechSynthesis.speak(utterance);
     }
 }
