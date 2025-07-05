@@ -14,6 +14,7 @@ class ThemeManager {
         };
         
         this.themeColors = {
+            'light': '#F0A8D0',
             'dark': '#1a1a2e',
             'cream': '#555879',
             'mint': '#333446',
@@ -79,7 +80,7 @@ class ThemeManager {
     updateThemeColor(theme) {
         const themeColorMeta = document.querySelector('meta[name="theme-color"]');
         if (themeColorMeta) {
-            themeColorMeta.content = this.themeColors[theme] || this.themeColors.light;
+            themeColorMeta.content = this.themeColors[theme] || this.themeColors.cream;
         }
     }
 

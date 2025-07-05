@@ -70,41 +70,7 @@
     --shadow-heavy: 0 15px 35px rgba(0,0,0,0.5);
 }
 
-/* 베이지 크림 테마 */
-[data-theme="cream"] {
-    /* 색상 변수 */
-    --bg-gradient-start: #555879;
-    --bg-gradient-end: #98A1BC;
-    --text-primary: #2d2d3a;
-    --text-secondary: #555879;
-    --text-muted: #8a8a8a;
-    --text-white: #ffffff;
-    --text-on-primary: #ffffff;
-    
-    /* 배경 색상 */
-    --bg-main: rgba(244, 235, 211, 0.95);
-    --bg-card: #F4EBD3;
-    --bg-overlay: rgba(85, 88, 121, 0.8);
-    --bg-input: #ffffff;
-    --bg-secondary: #DED3C4;
-    
-    /* 테두리 색상 */
-    --border-light: #DED3C4;
-    --border-focus: #555879;
-    
-    /* 버튼 색상 */
-    --btn-primary: #555879;
-    --btn-primary-hover: #4a4d6b;
-    --btn-secondary: #98A1BC;
-    --btn-secondary-hover: #8a94b0;
-    --btn-danger: #d63384;
-    --btn-danger-hover: #b02a5b;
-    
-    /* 그림자 */
-    --shadow-light: 0 2px 5px rgba(85, 88, 121, 0.15);
-    --shadow-medium: 0 5px 15px rgba(85, 88, 121, 0.2);
-    --shadow-heavy: 0 15px 35px rgba(85, 88, 121, 0.25);
-}
+/* 베이지 크림 테마 (:root에서 기본으로 정의됨) */
 
 /* 민트 그레이 테마 - Color Hunt 팔레트 2 */
 [data-theme="mint"] {
