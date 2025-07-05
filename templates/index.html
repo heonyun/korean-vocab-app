@@ -395,7 +395,8 @@
             function updateThemeColor(theme) {
                 const themeColorMeta = document.querySelector('meta[name="theme-color"]');
                 if (themeColorMeta) {
-                    themeColorMeta.content = theme === 'dark' ? '#1a1a2e' : '#667eea';
+                    // 라이트 테마 색상을 #F0A8D0으로 변경, 다크 테마는 기존 유지 또는 chat.html과 통일 필요
+                    themeColorMeta.content = theme === 'dark' ? '#1a1a2e' : '#F0A8D0';
                 }
             }
             
