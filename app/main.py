@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Request, Form, WebSocket, WebSocketD
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import logging
 import os
@@ -33,6 +34,37 @@ app = FastAPI(
     description="러시아인을 위한 한국어 어휘 학습 도구",
     version="0.1.6"
 )
+
+# 보안 헤더 미들웨어 추가
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    
+    # 기본 보안 헤더
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    
+    # CSP 헤더 (XSS 보호)
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com; "
+        "style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; "
+        "img-src 'self' data: https:; "
+        "font-src 'self' https:; "
+        "connect-src 'self'"
+    )
+    
+    # 캐싱 정책: static 파일은 캐싱 허용, API는 no-cache
+    if not request.url.path.startswith('/static'):
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    
+    # JSON 응답에 charset 추가
+    if response.headers.get("content-type") == "application/json":
+        response.headers["content-type"] = "application/json; charset=utf-8"
+    
+    return response
 
 # 정적 파일 및 템플릿 설정
 app.mount("/static", StaticFiles(directory="static"), name="static")

@@ -3,246 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Korean Learning Terminal | 한국어 학습 터미널</title>
-    <link rel="stylesheet" href="/static/terminal.css?v=scroll-fix-2">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png">
+    <title>Korean Learning Terminal</title>
+    <link rel="stylesheet" href="/static/terminal.css">
 </head>
 <body>
-    <!-- 상단 네비게이션 바 -->
-    <div class="nav-header">
-        <div class="nav-left">
-            <button id="hamburgerMenu" class="hamburger-btn" title="메뉴">
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-            </button>
-            <div class="app-title">Korean Learning Terminal</div>
-        </div>
-        <div class="nav-right">
-            <button id="settingsBtn" class="nav-btn" title="설정">⚙️</button>
-            <button id="helpBtn" class="nav-btn" title="도움말">❓</button>
-        </div>
-    </div>
-
-    <!-- 햄버거 메뉴 사이드바 -->
-    <div id="sidebarMenu" class="sidebar-menu hidden">
-        <div class="sidebar-header">
-            <h3>메뉴</h3>
-            <button id="closeSidebar" class="close-btn">×</button>
-        </div>
-        <div class="sidebar-content">
-            <div class="menu-section">
-                <h4>세션 관리</h4>
-                <ul class="session-list" id="sessionList">
-                    <li class="session-item current">
-                        <span class="session-title">현재 세션</span>
-                        <span class="session-time">방금 전</span>
-                    </li>
-                </ul>
-                <button id="newSessionBtn" class="menu-btn">+ 새 세션</button>
-            </div>
-            
-            <div class="menu-section">
-                <h4>빠른 기능</h4>
-                <button id="quickHelpBtn" class="menu-btn">🆘 도움말</button>
-                <button id="quickClearBtn" class="menu-btn">🗑️ 화면 지우기</button>
-                <button id="quickCopyBtn" class="menu-btn">📋 마지막 번역 복사</button>
-            </div>
-            
-            <div class="menu-section">
-                <h4>모드 변경</h4>
-                <div class="mode-buttons">
-                    <button class="mode-btn active" data-mode="auto">자동 감지</button>
-                    <button class="mode-btn" data-mode="korean">한→러</button>
-                    <button class="mode-btn" data-mode="russian">러→한</button>
-                </div>
-            </div>
-            
-            <div class="menu-section">
-                <h4>테마</h4>
-                <div class="theme-buttons">
-                    <button class="theme-btn active" data-theme="terminal">터미널</button>
-                    <button class="theme-btn" data-theme="warm">따뜻한</button>
-                    <button class="theme-btn" data-theme="soft">부드러운</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 사이드바 배경 오버레이 -->
-    <div id="sidebarOverlay" class="sidebar-overlay hidden"></div>
-
-    <div class="terminal-container">
-        <!-- 터미널 헤더 (맥OS 스타일) -->
+    <div class="terminal-window">
         <div class="terminal-header">
             <div class="traffic-lights">
-                <div class="traffic-light red"></div>
-                <div class="traffic-light yellow"></div>
-                <div class="traffic-light green"></div>
+                <span class="traffic-light close"></span>
+                <span class="traffic-light minimize"></span>
+                <span class="traffic-light maximize"></span>
             </div>
-            <div class="terminal-title">Korean Learning Terminal - /home/user/korean-vocab</div>
-            <div class="terminal-controls">
-                <button id="minimizeBtn" class="control-btn" title="최소화">−</button>
-                <button id="maximizeBtn" class="control-btn" title="최대화">□</button>
-                <button id="closeBtn" class="control-btn" title="닫기">×</button>
-            </div>
+            <div class="terminal-title">Korean Learning Terminal</div>
         </div>
-
-        <!-- 터미널 메인 영역 -->
-        <div class="terminal-main">
-            <!-- 채팅/메시지 영역 -->
-            <div id="terminal-output" class="terminal-output">
-                <!-- 시작 메시지 -->
-                <div class="welcome-message">
-                    <div class="ascii-art">
-    ██╗  ██╗ ██████╗ ██████╗ ███████╗ █████╗ ███╗   ██╗
-    ██║ ██╔╝██╔═══██╗██╔══██╗██╔════╝██╔══██╗████╗  ██║
-    █████╔╝ ██║   ██║██████╔╝█████╗  ███████║██╔██╗ ██║
-    ██╔═██╗ ██║   ██║██╔══██╗██╔══╝  ██╔══██║██║╚██╗██║
-    ██║  ██╗╚██████╔╝██║  ██║███████╗██║  ██║██║ ╚████║
-    ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
-                    </div>
-                    <div class="welcome-text">
-                        <p>🚀 한국어 학습 터미널에 오신 것을 환영합니다!</p>
-                        <p>💬 메시지를 입력하면 자동으로 번역됩니다.</p>
-                        <p>⚡ '/help'를 입력하여 명령어를 확인하세요.</p>
-                        <p>🌍 현재 모드: <span id="current-mode">자동 감지</span></p>
-                    </div>
-                </div>
-                
-                <!-- 동적으로 추가되는 메시지들 -->
+        <div class="terminal-body">
+            <div id="chat-output" class="chat-output">
+                <!-- Messages will be appended here -->
             </div>
-
-            <!-- 입력 영역 -->
-            <div class="terminal-input-container">
-                <!-- 프롬프트 -->
-                <div class="terminal-prompt">
-                    <span class="prompt-user">user@korean-terminal</span>
-                    <span class="prompt-separator">:</span>
-                    <span class="prompt-path">~/translate</span>
-                    <span class="prompt-symbol">$</span>
-                </div>
-                
-                <!-- 입력 필드 -->
-                <input 
-                    type="text" 
-                    id="terminal-input" 
-                    class="terminal-input" 
-                    placeholder="메시지를 입력하세요... (한국어 또는 러시아어)"
-                    autocomplete="off"
-                    spellcheck="false"
-                >
-                
-                <!-- 로딩 인디케이터 -->
-                <div id="loading-indicator" class="loading-indicator hidden">
-                    <span class="loading-dot">.</span>
-                    <span class="loading-dot">.</span>
-                    <span class="loading-dot">.</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- 상태바 -->
-        <div class="terminal-status">
-            <div class="status-left">
-                <span id="connection-status" class="status-item">🔴 연결 중...</span>
-                <span id="mode-status" class="status-item">모드: <span id="mode-display">자동</span></span>
-            </div>
-            <div class="status-right">
-                <span id="stats-display" class="status-item">번역: 0 | 명령어: 0</span>
-                <span class="status-item">⌨️ Korean Terminal v1.0</span>
+            <div class="terminal-input-area">
+                <span class="prompt">$</span>
+                <input type="text" id="chat-input" class="terminal-input" autofocus
+                       aria-label="터미널 명령어 입력"
+                       title="명령어를 입력하세요"
+                       placeholder="명령어를 입력하세요...">
             </div>
         </div>
     </div>
-
-    <!-- 오프라인 모달 -->
-    <div id="offline-modal" class="modal hidden">
-        <div class="modal-content">
-            <h3>🔌 연결이 끊어졌습니다</h3>
-            <p>WebSocket 연결이 끊어졌습니다. 자동으로 재연결을 시도합니다.</p>
-            <div class="reconnect-progress">
-                <div class="progress-bar">
-                    <div id="reconnect-bar" class="progress-fill"></div>
-                </div>
-                <span id="reconnect-status">재연결 중...</span>
-            </div>
-            <button id="manual-reconnect" class="btn-reconnect">수동 재연결</button>
-        </div>
-    </div>
-
-    <!-- 설정 모달 (향후 구현) -->
-    <div id="settings-modal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>⚙️ 터미널 설정</h3>
-                <button id="close-settings" class="close-btn">×</button>
-            </div>
-            <div class="settings-content">
-                <div class="setting-group">
-                    <label>테마</label>
-                    <select id="theme-select">
-                        <option value="default">기본 (그린)</option>
-                        <option value="blue">블루</option>
-                        <option value="amber">앰버</option>
-                        <option value="white">화이트</option>
-                    </select>
-                </div>
-                <div class="setting-group">
-                    <label>타이핑 애니메이션</label>
-                    <input type="checkbox" id="typing-animation" checked>
-                </div>
-                <div class="setting-group">
-                    <label>음성 재생</label>
-                    <input type="checkbox" id="voice-enabled">
-                </div>
-                <div class="setting-group">
-                    <label>자동 스크롤</label>
-                    <input type="checkbox" id="auto-scroll" checked>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button id="save-settings" class="btn-primary">저장</button>
-                <button id="reset-settings" class="btn-secondary">초기화</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 키보드 단축키 도움말 -->
-    <div id="shortcuts-help" class="help-overlay hidden">
-        <div class="help-content">
-            <h3>⌨️ 키보드 단축키</h3>
-            <div class="shortcuts-list">
-                <div class="shortcut">
-                    <kbd>Ctrl</kbd> + <kbd>L</kbd>
-                    <span>화면 지우기</span>
-                </div>
-                <div class="shortcut">
-                    <kbd>Ctrl</kbd> + <kbd>Enter</kbd>
-                    <span>강제 전송</span>
-                </div>
-                <div class="shortcut">
-                    <kbd>↑</kbd> / <kbd>↓</kbd>
-                    <span>명령어 히스토리</span>
-                </div>
-                <div class="shortcut">
-                    <kbd>Tab</kbd>
-                    <span>명령어 자동완성</span>
-                </div>
-                <div class="shortcut">
-                    <kbd>Esc</kbd>
-                    <span>입력 취소</span>
-                </div>
-                <div class="shortcut">
-                    <kbd>F1</kbd>
-                    <span>이 도움말 토글</span>
-                </div>
-            </div>
-            <p class="help-footer">Press <kbd>F1</kbd> or <kbd>Esc</kbd> to close</p>
-        </div>
-    </div>
-
-    <!-- JavaScript -->
-    <script src="/static/terminal.js?v=scroll-fix-2"></script>
+    <script src="/static/terminal.js"></script>
 </body>
 </html>
