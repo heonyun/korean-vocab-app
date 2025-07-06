@@ -304,6 +304,9 @@
             </div>
         </div>
         
+        <!-- 진도 위젯 -->
+        <div id="progress-widget-container"></div>
+        
         <!-- 타이핑 인디케이터 -->
         <div id="typing-indicator" class="hidden p-4">
             <div class="message-bubble message-ai rounded-lg p-3 typing-indicator">
@@ -497,6 +500,24 @@
                             <div class="theme-option theme-navy" data-theme="navy" title="네이비 크림">
                                 <span class="theme-label">네이비</span>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 새로운 기능들 -->
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-xl">📚</span>
+                            <span class="font-medium text-gray-900 dark:text-white">학습 도구</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="favoritesManager.showFavoritesModal()" class="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300">
+                                <span>🦊</span>
+                                <span class="text-sm">즐겨찾기</span>
+                            </button>
+                            <button onclick="progressTracker.showDetailedStats()" class="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300">
+                                <span>📊</span>
+                                <span class="text-sm">학습 통계</span>
+                            </button>
                         </div>
                     </div>
                     
@@ -1462,8 +1483,10 @@
             
             // 이벤트 위임 방식으로 테마 버튼 클릭 처리
             document.addEventListener('click', (e) => {
-                if (e.target.classList.contains('theme-option')) {
-                    const selectedTheme = e.target.getAttribute('data-theme');
+                // closest를 사용하여 클릭된 요소나 그 부모 중에서 theme-option을 찾음
+                const themeOption = e.target.closest('.theme-option');
+                if (themeOption) {
+                    const selectedTheme = themeOption.getAttribute('data-theme');
                     setTheme(selectedTheme);
                     
                     // 간단한 알림
@@ -1503,8 +1526,18 @@
             // 북마크 카운트 초기 로드
             updateBookmarkCounts();
             
+            // 진도 위젯 초기화
+            const progressContainer = document.getElementById('progress-widget-container');
+            if (progressContainer) {
+                progressContainer.appendChild(progressTracker.createProgressWidget());
+            }
+            
             messageInput.focus();
         });
     </script>
+    
+    <!-- 새로운 기능 스크립트 -->
+    <script src="/static/favorites.js"></script>
+    <script src="/static/progress-tracker.js"></script>
 </body>
 </html>

@@ -1,0 +1,169 @@
+/* React 버전 커스텀 CSS */
+
+/* CSS 변수 - 테마별 색상 정의 */
+:root {
+  /* 라이트 테마 */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-card: #ffffff;
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --text-on-primary: #ffffff;
+  --border-light: #e5e7eb;
+  --shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  --shadow-heavy: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+  --btn-primary: #3b82f6;
+  --btn-secondary: #10b981;
+}
+
+.dark {
+  /* 다크 테마 */
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --bg-card: #1f2937;
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+  --text-on-primary: #ffffff;
+  --border-light: #374151;
+  --shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  --shadow-heavy: 0 10px 25px -3px rgba(0, 0, 0, 0.3);
+  --btn-primary: #3b82f6;
+  --btn-secondary: #10b981;
+}
+
+[data-theme="cream"] {
+  /* 크림 테마 */
+  --bg-primary: #fefcf3;
+  --bg-secondary: #fef7ed;
+  --bg-card: #ffffff;
+  --text-primary: #92400e;
+  --text-secondary: #a16207;
+  --text-muted: #d97706;
+  --btn-primary: #d97706;
+  --btn-secondary: #92400e;
+}
+
+[data-theme="mint"] {
+  /* 민트 테마 (다크 기반) */
+  --bg-primary: #064e3b;
+  --bg-secondary: #065f46;
+  --bg-card: #047857;
+  --text-primary: #d1fae5;
+  --text-secondary: #a7f3d0;
+  --text-muted: #6ee7b7;
+  --btn-primary: #10b981;
+  --btn-secondary: #059669;
+}
+
+[data-theme="navy"] {
+  /* 네이비 테마 (다크 기반) */
+  --bg-primary: #1e3a8a;
+  --bg-secondary: #1e40af;
+  --bg-card: #2563eb;
+  --text-primary: #dbeafe;
+  --text-secondary: #bfdbfe;
+  --text-muted: #93c5fd;
+  --btn-primary: #3b82f6;
+  --btn-secondary: #2563eb;
+}
+
+/* 채팅 메시지 커스텀 스타일 */
+.cs-message-list {
+  background-color: var(--bg-secondary) !important;
+}
+
+.cs-message-input {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-light) !important;
+}
+
+.cs-message--incoming .cs-message__content {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+}
+
+.cs-message--outgoing .cs-message__content {
+  background: linear-gradient(135deg, #F0A8D0 0%, #E284BE 100%) !important;
+  color: white !important;
+}
+
+/* 스크롤바 커스텀 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--btn-primary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--btn-secondary);
+}
+
+/* 애니메이션 */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-enter {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+  .sidebar-overlay {
+    backdrop-filter: blur(4px);
+  }
+}
+
+/* 다크모드 전환 애니메이션 */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* 채팅 UI 커스터마이징 */
+.cs-conversation-container {
+  height: 100% !important;
+}
+
+.cs-main-container {
+  height: 100% !important;
+  background-color: var(--bg-secondary) !important;
+}
+
+.cs-chat-container {
+  height: 100% !important;
+}
+
+/* 북마크 버튼 호버 효과 */
+.bookmark-button {
+  transition: transform 0.2s ease;
+}
+
+.bookmark-button:hover {
+  transform: scale(1.1);
+}
+
+/* TTS 버튼 호버 효과 */
+.tts-button {
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.tts-button:hover {
+  transform: scale(1.1);
+  color: var(--btn-primary);
+}
