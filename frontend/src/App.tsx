@@ -11,8 +11,17 @@ function App() {
   useEffect(() => {
     // 시스템 테마 감지
     const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    const savedTheme = localStorage.getItem('theme') as any;
-    const initialTheme = savedTheme || systemTheme;
+    const savedTheme = localStorage.getItem('theme');
+    
+    // 타입 안전한 테마 검증
+    const validThemes = ['light', 'dark', 'cream', 'mint', 'navy'] as const;
+    type Theme = typeof validThemes[number];
+    
+    const isValidTheme = (theme: string | null): theme is Theme => {
+      return theme !== null && validThemes.includes(theme as Theme);
+    };
+    
+    const initialTheme = isValidTheme(savedTheme) ? savedTheme : systemTheme;
     
     setTheme(initialTheme);
   }, [setTheme]);

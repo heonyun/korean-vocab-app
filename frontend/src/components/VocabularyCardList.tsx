@@ -49,6 +49,20 @@ export const VocabularyCardList: React.FC<VocabularyCardListProps> = ({
         return [...filtered].sort((a, b) => 
           new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime()
         );
+      case 'bookmark':
+        // 북마크된 항목을 먼저, 그 다음 최신순으로 정렬
+        return [...filtered].sort((a, b) => {
+          // TODO: 실제 북마크 상태를 확인하는 로직이 필요
+          // 현재는 임시로 created_at 기준으로 정렬
+          const aBookmarked = false; // a.isBookmarked || false;
+          const bBookmarked = false; // b.isBookmarked || false;
+          
+          if (aBookmarked && !bBookmarked) return -1;
+          if (!aBookmarked && bBookmarked) return 1;
+          
+          // 둘 다 북마크되었거나 안되었으면 최신순으로
+          return new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime();
+        });
       default:
         return filtered;
     }

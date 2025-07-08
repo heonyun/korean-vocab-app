@@ -1,7 +1,7 @@
 import React from 'react'
 import { useChatStore } from '../store/chatStore'
+import { AssistantMessage } from './AssistantMessage'
 
-// Simplified AssistantThread component for the migration
 export const AssistantThread: React.FC = () => {
   const { messages } = useChatStore()
 
@@ -29,17 +29,10 @@ export const AssistantThread: React.FC = () => {
           </div>
         )}
 
-        {/* Messages container - will be enhanced with full Assistant UI integration later */}
+        {/* Messages using AssistantMessage component */}
         <div className="space-y-4">
           {messages.map((message) => (
-            <div key={message.id || Date.now()} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-              <div className="font-semibold text-sm text-blue-600 dark:text-blue-400 mb-1">
-                {message.type === 'user' ? '나' : 'AI'}
-              </div>
-              <div className="text-gray-900 dark:text-gray-100">
-                {message.text}
-              </div>
-            </div>
+            <AssistantMessage key={message.id || Date.now()} message={message} />
           ))}
         </div>
       </div>
