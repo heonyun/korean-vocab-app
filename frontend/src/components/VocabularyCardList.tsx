@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { VocabularyCard } from './VocabularyCard';
+import { useBookmarkStore } from '../store/bookmarkStore';
 import type { VocabularyEntry } from '../types/api';
 
 interface VocabularyCardListProps {
@@ -22,6 +23,8 @@ export const VocabularyCardList: React.FC<VocabularyCardListProps> = ({
   filterQuery = '',
   sortBy = 'recent'
 }) => {
+  const { isBookmarked } = useBookmarkStore();
+
   // 필터링 및 정렬
   const filteredAndSorted = useMemo(() => {
     let filtered = vocabularies;
@@ -52,10 +55,9 @@ export const VocabularyCardList: React.FC<VocabularyCardListProps> = ({
       case 'bookmark':
         // 북마크된 항목을 먼저, 그 다음 최신순으로 정렬
         return [...filtered].sort((a, b) => {
-          // TODO: 실제 북마크 상태를 확인하는 로직이 필요
-          // 현재는 임시로 created_at 기준으로 정렬
-          const aBookmarked = false; // a.isBookmarked || false;
-          const bBookmarked = false; // b.isBookmarked || false;
+          // 실제 북마크 상태 확인
+          const aBookmarked = a.id ? isBookmarked(a.id) : false;
+          const bBookmarked = b.id ? isBookmarked(b.id) : false;
           
           if (aBookmarked && !bBookmarked) return -1;
           if (!aBookmarked && bBookmarked) return 1;
@@ -66,7 +68,7 @@ export const VocabularyCardList: React.FC<VocabularyCardListProps> = ({
       default:
         return filtered;
     }
-  }, [vocabularies, filterQuery, sortBy]);
+  }, [vocabularies, filterQuery, sortBy, isBookmarked]);
 
   // 로딩 상태
   if (loading) {

@@ -114,17 +114,37 @@ class ApiService {
     });
   }
 
-  // 북마크 제거 (deleteBookmark를 통해 처리)
-  async removeBookmark(_request: BookmarkRequest): Promise<BookmarkResponse> {
-    // message_id를 통해 bookmark를 찾고 deleteBookmark 메서드 사용
-    // 실제 구현에서는 bookmark ID를 먼저 조회해야 하지만,
-    // 현재는 simplified response를 반환
+  // 북마크 제거 (message_id 기반)
+  async removeBookmark(request: BookmarkRequest): Promise<BookmarkResponse> {
     try {
-      // TODO: 실제로는 message_id로 bookmark ID를 조회해야 함
-      // 현재는 임시로 성공 응답 반환
+      // 먼저 모든 북마크를 가져와서 해당 message_id의 북마크를 찾음
+      const bookmarksResponse = await this.getBookmarks();
+      
+      if (!bookmarksResponse.success) {
+        return {
+          success: false,
+          error: 'Failed to fetch bookmarks'
+        };
+      }
+      
+      const bookmark = bookmarksResponse.bookmarks.find(
+        b => b.message_id === request.message_id && b.session_id === request.session_id
+      );
+      
+      if (!bookmark) {
+        return {
+          success: false,
+          error: 'Bookmark not found'
+        };
+      }
+      
+      // 찾은 북마크의 ID로 deleteBookmark 호출
+      const deleteResponse = await this.deleteBookmark(bookmark.id);
+      
       return {
-        success: true,
-        bookmark: undefined // removeBookmark는 삭제 후 bookmark 객체를 반환하지 않음
+        success: deleteResponse.success,
+        bookmark: deleteResponse.success ? undefined : undefined,
+        error: deleteResponse.success ? undefined : 'Failed to delete bookmark'
       };
     } catch (error) {
       return {
