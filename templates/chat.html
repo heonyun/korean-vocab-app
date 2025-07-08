@@ -300,9 +300,12 @@
                 <div class="font-medium mb-2">👋 안녕하세요! 한국어 ↔ 러시아어 번역을 도와드릴게요!</div>
                 <div class="text-xs text-gray-600 dark:text-gray-400 mb-2">💡 팁: /로 상황을 설명할 수 있어요!</div>
                 <div class="text-xs italic text-purple-600 dark:text-purple-400 mb-1">For Emma, my eternal Muse</div>
-                <div class="text-xs text-gray-500 dark:text-gray-500">v0.1.5</div>
+                <div class="text-xs text-gray-500 dark:text-gray-500">v0.1.6</div>
             </div>
         </div>
+        
+        <!-- 진도 위젯 -->
+        <div id="progress-widget-container"></div>
         
         <!-- 타이핑 인디케이터 -->
         <div id="typing-indicator" class="hidden p-4">
@@ -472,6 +475,49 @@
                                 <span id="speed-display-modal">0.8x</span>
                                 <span>2.0x</span>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 색상 테마 선택 -->
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-xl">🎨</span>
+                            <span class="font-medium text-gray-900 dark:text-white">색상 테마</span>
+                        </div>
+                        <div class="theme-selector grid grid-cols-5 gap-2">
+                            <div class="theme-option theme-light" data-theme="light" title="라이트 모드">
+                                <span class="theme-label">라이트</span>
+                            </div>
+                            <div class="theme-option theme-dark" data-theme="dark" title="다크 모드">
+                                <span class="theme-label">다크</span>
+                            </div>
+                            <div class="theme-option theme-cream" data-theme="cream" title="베이지 크림">
+                                <span class="theme-label">크림</span>
+                            </div>
+                            <div class="theme-option theme-mint" data-theme="mint" title="민트 그레이">
+                                <span class="theme-label">민트</span>
+                            </div>
+                            <div class="theme-option theme-navy" data-theme="navy" title="네이비 크림">
+                                <span class="theme-label">네이비</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 새로운 기능들 -->
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-xl">📚</span>
+                            <span class="font-medium text-gray-900 dark:text-white">학습 도구</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="favoritesManager.showFavoritesModal()" class="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300">
+                                <span>🦊</span>
+                                <span class="text-sm">즐겨찾기</span>
+                            </button>
+                            <button onclick="progressTracker.showDetailedStats()" class="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300">
+                                <span>📊</span>
+                                <span class="text-sm">학습 통계</span>
+                            </button>
                         </div>
                     </div>
                     
@@ -1370,7 +1416,7 @@
                             <div class="font-medium mb-2">👋 안녕하세요! 한국어 ↔ 러시아어 번역을 도와드릴게요!</div>
                             <div class="text-xs text-gray-600 dark:text-gray-400 mb-2">💡 팁: /로 상황을 설명할 수 있어요!</div>
                             <div class="text-xs italic text-purple-600 dark:text-purple-400 mb-1">For Emma, my eternal Muse</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-500">v0.1.5</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-500">v0.1.6</div>
                         </div>
                     `;
                     
@@ -1397,10 +1443,73 @@
         }
         
         document.addEventListener('DOMContentLoaded', () => {
+            // 테마 관리 함수들
+            function setTheme(theme) {
+                // Tailwind 다크모드 클래스 설정
+                // 'mint'와 'navy' 테마도 다크모드 기반으로 처리
+                const darkThemes = ['dark', 'mint', 'navy'];
+                if (darkThemes.includes(theme)) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                
+                // 테마 속성 설정
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                
+                // 테마 선택 버튼들 활성 상태 업데이트
+                updateThemeButtons(theme);
+            }
+            
+            function updateThemeButtons(currentTheme) {
+                const themeButtons = document.querySelectorAll('.theme-option');
+                themeButtons.forEach(button => {
+                    const buttonTheme = button.getAttribute('data-theme');
+                    if (buttonTheme === currentTheme) {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+                });
+            }
+            
             // 저장된 테마 로드
             const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
+            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            const currentTheme = savedTheme || systemTheme;
+            
+            setTheme(currentTheme);
+            
+            // 이벤트 위임 방식으로 테마 버튼 클릭 처리
+            document.addEventListener('click', (e) => {
+                // closest를 사용하여 클릭된 요소나 그 부모 중에서 theme-option을 찾음
+                const themeOption = e.target.closest('.theme-option');
+                if (themeOption) {
+                    const selectedTheme = themeOption.getAttribute('data-theme');
+                    setTheme(selectedTheme);
+                    
+                    // 간단한 알림
+                    const themeNames = {
+                        'light': '라이트',
+                        'dark': '다크',
+                        'cream': '베이지 크림',
+                        'mint': '민트 그레이',
+                        'navy': '네이비 크림'
+                    };
+                    console.log(`${themeNames[selectedTheme]} 테마로 전환되었습니다!`);
+                }
+            });
+            
+            // 설정 패널이 열릴 때 UI 업데이트
+            const settingsBtn = document.getElementById('settings-btn');
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', () => {
+                    setTimeout(() => {
+                        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+                        updateThemeButtons(currentTheme);
+                    }, 100);
+                });
             }
             
             // TTS 음성 로드 (브라우저 호환성)
@@ -1417,8 +1526,18 @@
             // 북마크 카운트 초기 로드
             updateBookmarkCounts();
             
+            // 진도 위젯 초기화
+            const progressContainer = document.getElementById('progress-widget-container');
+            if (progressContainer) {
+                progressContainer.appendChild(progressTracker.createProgressWidget());
+            }
+            
             messageInput.focus();
         });
     </script>
+    
+    <!-- 새로운 기능 스크립트 -->
+    <script src="/static/favorites.js"></script>
+    <script src="/static/progress-tracker.js"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Request, Form, WebSocket, WebSocketD
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import logging
 import os
@@ -32,6 +33,21 @@ app = FastAPI(
     title="한국어 어휘 학습 노트",
     description="러시아인을 위한 한국어 어휘 학습 도구",
     version="0.1.6"
+)
+
+# CORS 설정 - React 개발 서버와 연동
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",  # React 개발 서버
+        "http://localhost:5173",  # Vite 개발 서버
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:5173",
+        "https://korean-vocab-app.onrender.com",  # 프로덕션
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # 정적 파일 및 템플릿 설정
