@@ -32,6 +32,7 @@ export interface VocabularyRequest {
 
 export interface VocabularyResponse {
   success: boolean;
+  data?: VocabularyEntry;
   entry?: VocabularyEntry;
   error?: string;
 }

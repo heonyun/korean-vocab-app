@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { ChatInterface } from './components/ChatInterface';
+import { AssistantChatInterface } from './components/AssistantChatInterface';
 import { useThemeStore } from './store/themeStore';
-import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import './App.css';
 
 function App() {
@@ -32,7 +31,7 @@ function App() {
 
   return (
     <div className="App min-h-screen bg-gray-50 dark:bg-gray-900">
-      <ChatInterface />
+      <AssistantChatInterface />
       
       {/* Toast 알림 */}
       <Toaster
