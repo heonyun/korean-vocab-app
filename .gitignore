@@ -45,6 +45,7 @@ config.json
 # IDE
 .vscode/
 .idea/
+.claude/
 *.swp
 *.swo
 *~
@@ -81,14 +82,17 @@ pids/
 *.seed
 *.pid.lock
 
-# Coverage directory used by tools like istanbul
-coverage/
-
-# Node.js (if using any frontend tools)
+# Node.js & JavaScript Testing
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+package-lock.json
+.nyc_output/
+coverage/
+*.tgz
+.npm
+.eslintcache
 
 # Backup files
 *.backup
