@@ -70,6 +70,114 @@
     --shadow-heavy: 0 15px 35px rgba(0,0,0,0.5);
 }
 
+/* 베이지 크림 테마 */
+[data-theme="cream"] {
+    /* 색상 변수 */
+    --bg-gradient-start: #555879;
+    --bg-gradient-end: #98A1BC;
+    --text-primary: #2d2d3a;
+    --text-secondary: #555879;
+    --text-muted: #8a8a8a;
+    --text-white: #ffffff;
+    --text-on-primary: #ffffff;
+    
+    /* 배경 색상 */
+    --bg-main: rgba(244, 235, 211, 0.95);
+    --bg-card: #F4EBD3;
+    --bg-overlay: rgba(85, 88, 121, 0.8);
+    --bg-input: #ffffff;
+    --bg-secondary: #DED3C4;
+    
+    /* 테두리 색상 */
+    --border-light: #DED3C4;
+    --border-focus: #555879;
+    
+    /* 버튼 색상 */
+    --btn-primary: #555879;
+    --btn-primary-hover: #4a4d6b;
+    --btn-secondary: #98A1BC;
+    --btn-secondary-hover: #8a94b0;
+    --btn-danger: #d63384;
+    --btn-danger-hover: #b02a5b;
+    
+    /* 그림자 */
+    --shadow-light: 0 2px 5px rgba(85, 88, 121, 0.15);
+    --shadow-medium: 0 5px 15px rgba(85, 88, 121, 0.2);
+    --shadow-heavy: 0 15px 35px rgba(85, 88, 121, 0.25);
+}
+
+/* 민트 그레이 테마 */
+[data-theme="mint"] {
+    /* 색상 변수 */
+    --bg-gradient-start: #333446;
+    --bg-gradient-end: #7F8CAA;
+    --text-primary: #2d2d3a;
+    --text-secondary: #333446;
+    --text-muted: #8a8a8a;
+    --text-white: #ffffff;
+    --text-on-primary: #ffffff;
+    
+    /* 배경 색상 */
+    --bg-main: rgba(234, 239, 239, 0.95);
+    --bg-card: #EAEFEF;
+    --bg-overlay: rgba(51, 52, 70, 0.8);
+    --bg-input: #ffffff;
+    --bg-secondary: #B8CFCE;
+    
+    /* 테두리 색상 */
+    --border-light: #B8CFCE;
+    --border-focus: #333446;
+    
+    /* 버튼 색상 */
+    --btn-primary: #333446;
+    --btn-primary-hover: #2a2b3b;
+    --btn-secondary: #7F8CAA;
+    --btn-secondary-hover: #6f7c99;
+    --btn-danger: #dc3545;
+    --btn-danger-hover: #c82333;
+    
+    /* 그림자 */
+    --shadow-light: 0 2px 5px rgba(51, 52, 70, 0.15);
+    --shadow-medium: 0 5px 15px rgba(51, 52, 70, 0.2);
+    --shadow-heavy: 0 15px 35px rgba(51, 52, 70, 0.25);
+}
+
+/* 네이비 크림 테마 */
+[data-theme="navy"] {
+    /* 색상 변수 */
+    --bg-gradient-start: #213448;
+    --bg-gradient-end: #547792;
+    --text-primary: #213448;
+    --text-secondary: #547792;
+    --text-muted: #8a8a8a;
+    --text-white: #ffffff;
+    --text-on-primary: #ffffff;
+    
+    /* 배경 색상 */
+    --bg-main: rgba(236, 239, 202, 0.95);
+    --bg-card: #ECEFCA;
+    --bg-overlay: rgba(33, 52, 72, 0.8);
+    --bg-input: #ffffff;
+    --bg-secondary: #94B4C1;
+    
+    /* 테두리 색상 */
+    --border-light: #94B4C1;
+    --border-focus: #213448;
+    
+    /* 버튼 색상 */
+    --btn-primary: #213448;
+    --btn-primary-hover: #1a2a3a;
+    --btn-secondary: #547792;
+    --btn-secondary-hover: #486580;
+    --btn-danger: #dc3545;
+    --btn-danger-hover: #c82333;
+    
+    /* 그림자 */
+    --shadow-light: 0 2px 5px rgba(33, 52, 72, 0.15);
+    --shadow-medium: 0 5px 15px rgba(33, 52, 72, 0.2);
+    --shadow-heavy: 0 15px 35px rgba(33, 52, 72, 0.25);
+}
+
 /* 기본 설정 */
 * {
     margin: 0;
@@ -763,6 +871,77 @@ body {
 .test-btn:hover {
     background: var(--btn-secondary-hover);
     transform: translateY(-1px);
+}
+
+/* 테마 선택 스타일 */
+.theme-selector {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.theme-option {
+    width: 60px;
+    height: 40px;
+    border: 2px solid var(--border-light);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-option:hover {
+    border-color: var(--border-focus);
+    transform: scale(1.05);
+}
+
+.theme-option.active {
+    border-color: var(--btn-primary);
+    border-width: 3px;
+}
+
+.theme-option.active::after {
+    content: '✓';
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    color: var(--btn-primary);
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+/* 각 테마 미리보기 색상 */
+.theme-light {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.theme-dark {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.theme-cream {
+    background: linear-gradient(135deg, #555879 0%, #98A1BC 100%);
+}
+
+.theme-mint {
+    background: linear-gradient(135deg, #333446 0%, #7F8CAA 100%);
+}
+
+.theme-navy {
+    background: linear-gradient(135deg, #213448 0%, #547792 100%);
+}
+
+.theme-label {
+    font-size: 0.75rem;
+    color: white;
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 /* 푸터 */

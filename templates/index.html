@@ -160,7 +160,7 @@
         <footer class="footer">
             <p>AI 기반 한국어 학습 도구 | PydanticAI + Gemini</p>
             <p class="emma-credit">For Emma, my eternal Muse</p>
-            <p class="version-info">v0.1.5</p>
+            <p class="version-info">v0.1.6</p>
         </footer>
     </div>
 
@@ -168,7 +168,7 @@
     <div id="audio-settings-panel" class="settings-panel hidden">
         <div class="settings-content">
             <div class="settings-header">
-                <h3>🔊 음성 설정</h3>
+                <h3>🔊 음성 & 🎨 테마 설정</h3>
                 <button id="close-settings-btn" class="close-btn">&times;</button>
             </div>
             <div class="settings-body">
@@ -188,6 +188,26 @@
                 </div>
                 <div class="setting-item">
                     <button id="test-audio-btn" class="test-btn">🔊 테스트 재생</button>
+                </div>
+                <div class="setting-item">
+                    <label>🎨 색상 테마</label>
+                    <div class="theme-selector">
+                        <div class="theme-option theme-light" data-theme="light" title="라이트 모드">
+                            <span class="theme-label">라이트</span>
+                        </div>
+                        <div class="theme-option theme-dark" data-theme="dark" title="다크 모드">
+                            <span class="theme-label">다크</span>
+                        </div>
+                        <div class="theme-option theme-cream" data-theme="cream" title="베이지 크림">
+                            <span class="theme-label">크림</span>
+                        </div>
+                        <div class="theme-option theme-mint" data-theme="mint" title="민트 그레이">
+                            <span class="theme-label">민트</span>
+                        </div>
+                        <div class="theme-option theme-navy" data-theme="navy" title="네이비 크림">
+                            <span class="theme-label">네이비</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -368,34 +388,57 @@
                 return currentTheme;
             }
             
-            // 테마 설정 (Tailwind 다크모드 호환)
+            // 테마 설정 (다중 테마 지원)
             function setTheme(theme) {
-                // Tailwind 다크모드 클래스 설정
+                // Tailwind 다크모드 클래스 설정 (다크 테마인 경우에만)
                 if (theme === 'dark') {
                     document.documentElement.classList.add('dark');
                 } else {
                     document.documentElement.classList.remove('dark');
                 }
                 
-                // 기존 호환성을 위한 data-theme 속성 유지
+                // 테마 속성 설정
                 document.documentElement.setAttribute('data-theme', theme);
                 localStorage.setItem('theme', theme);
                 
-                // 버튼 아이콘 업데이트
+                // 헤더 테마 토글 버튼 아이콘 업데이트
                 if (themeToggleBtn) {
                     themeToggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
                     themeToggleBtn.title = theme === 'dark' ? '라이트모드로 전환' : '다크모드로 전환';
                 }
                 
+                // 테마 선택 버튼들 활성 상태 업데이트
+                updateThemeButtons(theme);
+                
                 // PWA 테마 색상 업데이트
                 updateThemeColor(theme);
+            }
+            
+            // 테마 선택 버튼들 활성 상태 업데이트
+            function updateThemeButtons(currentTheme) {
+                const themeButtons = document.querySelectorAll('.theme-option');
+                themeButtons.forEach(button => {
+                    const buttonTheme = button.getAttribute('data-theme');
+                    if (buttonTheme === currentTheme) {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+                });
             }
             
             // PWA 테마 색상 업데이트
             function updateThemeColor(theme) {
                 const themeColorMeta = document.querySelector('meta[name="theme-color"]');
                 if (themeColorMeta) {
-                    themeColorMeta.content = theme === 'dark' ? '#1a1a2e' : '#667eea';
+                    const themeColors = {
+                        'light': '#667eea',
+                        'dark': '#1a1a2e',
+                        'cream': '#555879',
+                        'mint': '#333446',
+                        'navy': '#213448'
+                    };
+                    themeColorMeta.content = themeColors[theme] || '#667eea';
                 }
             }
             
@@ -422,12 +465,53 @@
             // 테마 토글 버튼 이벤트
             themeToggleBtn?.addEventListener('click', toggleTheme);
             
+            // 테마 선택 버튼들 이벤트 리스너 추가
+            function initThemeSelector() {
+                const themeButtons = document.querySelectorAll('.theme-option');
+                if (themeButtons.length === 0) {
+                    console.warn('테마 선택 버튼을 찾을 수 없습니다.');
+                    return;
+                }
+                
+                // 기존 이벤트 리스너 제거 (중복 방지)
+                themeButtons.forEach(button => {
+                    const newButton = button.cloneNode(true);
+                    button.parentNode.replaceChild(newButton, button);
+                });
+                
+                // 새로운 이벤트 리스너 추가
+                const newThemeButtons = document.querySelectorAll('.theme-option');
+                newThemeButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const selectedTheme = button.getAttribute('data-theme');
+                        setTheme(selectedTheme);
+                        
+                        // 테마 변경 알림
+                        const themeNames = {
+                            'light': '라이트',
+                            'dark': '다크',
+                            'cream': '베이지 크림',
+                            'mint': '민트 그레이',
+                            'navy': '네이비 크림'
+                        };
+                        showNotification(`${themeNames[selectedTheme]} 테마로 전환되었습니다!`, 'success');
+                    });
+                });
+                
+                // 현재 테마 상태 반영
+                const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+                updateThemeButtons(currentTheme);
+                
+                console.log(`테마 선택기 초기화 완료 (${newThemeButtons.length}개 버튼)`);
+            }
+            
             // 초기 테마 로드
             loadTheme();
         });
 
         // 음성 설정 패널 관리
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('📝 DOM 로드 완료 - 설정 패널 초기화 시작');
             const settingsBtn = document.getElementById('audio-settings-btn');
             const settingsPanel = document.getElementById('audio-settings-panel');
             const closeSettingsBtn = document.getElementById('close-settings-btn');
@@ -435,14 +519,25 @@
             const playbackRateValue = document.getElementById('playback-rate-value');
             const speedPresets = document.querySelectorAll('.speed-preset');
             const testAudioBtn = document.getElementById('test-audio-btn');
+            
+            console.log('🔍 요소 검색 결과:', {
+                settingsBtn: !!settingsBtn,
+                settingsPanel: !!settingsPanel,
+                closeSettingsBtn: !!closeSettingsBtn
+            });
 
             // 설정 패널 열기
             settingsBtn?.addEventListener('click', () => {
+                console.log('🔧 설정 패널 열기 클릭됨');
                 settingsPanel.classList.remove('hidden');
                 // 현재 설정값 로드
                 const currentRate = getPlaybackRate();
                 playbackRateSlider.value = currentRate;
                 playbackRateValue.textContent = currentRate + 'x';
+                
+                // 테마 선택기 초기화 (패널이 열릴 때마다)
+                console.log('🎨 테마 선택기 초기화 시작');
+                initThemeSelector();
             });
 
             // 설정 패널 닫기
