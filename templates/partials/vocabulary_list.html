@@ -11,14 +11,16 @@
                 <button hx-get="/htmx/vocabulary/{{ vocab.original_word }}"
                         hx-target="#vocabulary-detail-modal"
                         hx-trigger="click"
-                        class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-all duration-200">
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-all duration-200"
+                        title="{{ vocab.original_word }} 상세 정보 보기">
                     상세보기
                 </button>
                 <button hx-delete="/htmx/vocabulary/{{ vocab.original_word }}"
                         hx-target="closest .vocabulary-item"
                         hx-swap="outerHTML"
                         hx-confirm="정말로 '{{ vocab.original_word }}'를 삭제하시겠습니까?"
-                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-all duration-200">
+                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-all duration-200"
+                        title="{{ vocab.original_word }} 어휘 삭제">
                     삭제
                 </button>
             </div>
