@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Korean Vocab TTS Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+        }
+        .test-section h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        .korean-text {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2b6cb0;
+            margin: 10px 0;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.idle { background: #f0f8ff; color: #1e40af; }
+        .status.playing { background: #dcfce7; color: #166534; }
+        .status.error { background: #fee2e2; color: #dc2626; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Korean Vocab TTS Testing</h1>
+        
+        <div class="test-section">
+            <h3>📝 Clean Architecture TTS System</h3>
+            <div class="korean-text">안녕하세요, 만나서 반갑습니다!</div>
+            
+            <div class="controls">
+                <button onclick="playWord()">단어 재생</button>
+                <button onclick="playExample(0)">예문 1</button>
+                <button onclick="playExample(1)">예문 2</button>
+                <button onclick="stopCurrent()">중지</button>
+            </div>
+            
+            <div class="speed-control">
+                <label>속도:</label>
+                <button onclick="setPresetSpeed('slow')">느림</button>
+                <button onclick="setPresetSpeed('normal')">보통</button>
+                <button onclick="setPresetSpeed('fast')">빠름</button>
+                <button onclick="increaseSpeed()">+</button>
+                <button onclick="decreaseSpeed()">-</button>
+            </div>
+            
+            <div id="status" class="status idle">상태: IDLE</div>
+            <div id="speed-display">현재 속도: 1.0</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔄 Queue System Test</h3>
+            <div class="controls">
+                <button onclick="addToQueue()">큐에 추가</button>
+                <button onclick="playNext()">다음 재생</button>
+                <button onclick="clearQueue()">큐 초기화</button>
+            </div>
+            <div id="queue-status">큐 상태: 비어있음</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Browser Compatibility</h3>
+            <div id="browser-info"></div>
+            <button onclick="checkBrowserSupport()">브라우저 지원 확인</button>
+        </div>
+    </div>
+
+    <!-- Clean Architecture TTS Implementation -->
+    <script type="module">
+        // Import our Clean Architecture implementation
+        import { AudioConfig } from './src/entities/AudioConfig.js';
+        import { PlaybackState, PLAYBACK_STATES } from './src/entities/PlaybackState.js';
+        import { WebSpeechAdapter } from './src/frameworks/WebSpeechAdapter.js';
+        import { AudioManager } from './src/usecases/AudioManager.js';
+        import { SpeedController } from './src/usecases/SpeedController.js';
+        import { PlaybackController } from './src/usecases/PlaybackController.js';
+
+        // Initialize TTS System
+        const ttsAdapter = new WebSpeechAdapter();
+        const audioManager = new AudioManager(ttsAdapter);
+        const speedController = new SpeedController(audioManager);
+        const playbackController = new PlaybackController(audioManager);
+
+        // Mock vocabulary entry for testing
+        const mockVocabEntry = {
+            koreanWord: '안녕하세요',
+            examples: [
+                '안녕하세요, 만나서 반갑습니다.',
+                '안녕하세요라고 인사했다.',
+                '친구에게 안녕하세요라고 말했다.'
+            ]
+        };
+
+        // Event listeners for state changes
+        audioManager.on('complete', () => {
+            updateStatus('완료됨', 'idle');
+        });
+
+        audioManager.on('error', (error) => {
+            updateStatus(`오류: ${error.message}`, 'error');
+        });
+
+        speedController.on('speedChange', (data) => {
+            document.getElementById('speed-display').textContent = 
+                `현재 속도: ${data.newSpeed.toFixed(1)}`;
+        });
+
+        // Global functions for testing
+        window.playWord = async () => {
+            try {
+                updateStatus('단어 재생 중...', 'playing');
+                await playbackController.playWord(mockVocabEntry);
+            } catch (error) {
+                updateStatus(`오류: ${error.message}`, 'error');
+            }
+        };
+
+        window.playExample = async (index) => {
+            try {
+                updateStatus(`예문 ${index + 1} 재생 중...`, 'playing');
+                await playbackController.playExample(mockVocabEntry, index);
+            } catch (error) {
+                updateStatus(`오류: ${error.message}`, 'error');
+            }
+        };
+
+        window.stopCurrent = async () => {
+            try {
+                await playbackController.stopCurrent();
+                updateStatus('중지됨', 'idle');
+            } catch (error) {
+                updateStatus(`오류: ${error.message}`, 'error');
+            }
+        };
+
+        window.setPresetSpeed = (preset) => {
+            try {
+                speedController.setPresetSpeed(preset);
+                updateStatus(`속도 변경: ${preset}`, 'idle');
+            } catch (error) {
+                updateStatus(`오류: ${error.message}`, 'error');
+            }
+        };
+
+        window.increaseSpeed = () => {
+            try {
+                speedController.increaseSpeed();
+            } catch (error) {
+                updateStatus(`오류: ${error.message}`, 'error');
+            }
+        };
+
+        window.decreaseSpeed = () => {
+            try {
+                speedController.decreaseSpeed();
+            } catch (error) {
+                updateStatus(`오류: ${error.message}`, 'error');
+            }
+        };
+
+        window.addToQueue = () => {
+            playbackController.addToQueue(mockVocabEntry, 0);
+            playbackController.addToQueue(mockVocabEntry, 1);
+            playbackController.addToQueue(mockVocabEntry, 2);
+            updateQueueStatus();
+        };
+
+        window.playNext = async () => {
+            try {
+                const result = await playbackController.playNext();
+                if (result) {
+                    updateStatus('큐에서 재생 중...', 'playing');
+                } else {
+                    updateStatus('큐가 비어있음', 'idle');
+                }
+                updateQueueStatus();
+            } catch (error) {
+                updateStatus(`오류: ${error.message}`, 'error');
+            }
+        };
+
+        window.clearQueue = () => {
+            playbackController.clearQueue();
+            updateQueueStatus();
+        };
+
+        window.checkBrowserSupport = () => {
+            const adapter = new WebSpeechAdapter();
+            const debugInfo = adapter.getDebugInfo();
+            
+            document.getElementById('browser-info').innerHTML = `
+                <strong>브라우저 정보:</strong><br>
+                • Web Speech API 지원: ${debugInfo.isSupported ? '✅' : '❌'}<br>
+                • 음성 로딩 필요: ${debugInfo.requiresVoiceLoading ? '예' : '아니오'}<br>
+                • 사용자 상호작용 필요: ${debugInfo.requiresUserInteraction ? '예' : '아니오'}<br>
+                • 지원 언어 수: ${debugInfo.supportedLanguages}<br>
+                • User Agent: ${navigator.userAgent}
+            `;
+        };
+
+        function updateStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = `상태: ${message}`;
+            statusEl.className = `status ${type}`;
+        }
+
+        function updateQueueStatus() {
+            const queueLength = playbackController.getPlayQueue().length;
+            document.getElementById('queue-status').textContent = 
+                `큐 상태: ${queueLength}개 항목`;
+        }
+
+        // Initialize display
+        checkBrowserSupport();
+        console.log('🎯 Korean Vocab TTS Test Environment Ready!');
+        console.log('Clean Architecture implemented with:', {
+            entities: ['AudioConfig', 'PlaybackState'],
+            usecases: ['AudioManager', 'SpeedController', 'PlaybackController'],
+            frameworks: ['WebSpeechAdapter']
+        });
+    </script>
+</body>
+</html>
